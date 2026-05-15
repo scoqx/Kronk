@@ -1,0 +1,6 @@
+# Прод: один хост с автоматическим HTTPS (Let's Encrypt), если PUBLIC_HOSTNAME задан в env контейнера gateway.
+# Важно: DNS A/AAAA этого имени должен указывать на сервер до первого запуска.
+
+{$PUBLIC_HOSTNAME} {
+	import snippets/site.caddy
+}

@@ -1,0 +1,5 @@
+# В W/Linux shebang ломается при CRLF (ошибка bash\r)
+*.sh text eol=lf
+*.caddy text eol=lf
+Caddyfile text eol=lf
+Caddyfile.server text eol=lf

@@ -1,0 +1,44 @@
+encode gzip zstd
+
+handle /jellyfin {
+	redir /jellyfin/ 308
+}
+handle /jellyfin/* {
+	reverse_proxy jellyfin:8096 {
+		flush_interval -1
+		transport http {
+			read_timeout 0
+		}
+	}
+}
+
+handle /prowlarr {
+	redir /prowlarr/ 308
+}
+handle /prowlarr/* {
+	reverse_proxy prowlarr:9696
+}
+
+handle /transmission {
+	redir /transmission/ 308
+}
+handle /transmission/* {
+	reverse_proxy transmission:9091
+}
+
+handle {
+	root * /srv
+	file_server
+}
+
+header {
+	X-Content-Type-Options "nosniff"
+	Referrer-Policy "strict-origin-when-cross-origin"
+}
+
+# Опционально: HTTP Basic (браузер запросит логин до приложений).
+# caddy hash-password --plaintext 'your-secret'
+#
+# basicauth {
+#     admin $2a$14$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+# }

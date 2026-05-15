@@ -1,0 +1,70 @@
+# Один внешний вход (gateway): главная — статическая страница; сервисы по префиксам /jellyfin /prowlarr /transmission.
+# Caddy: локально см. Caddyfile; на сервере с TLS — CADDY_PRIMARY_FILE=Caddyfile.server и docker-compose.server.yml.
+# Общие директивы: caddy/snippets/site.caddy
+#
+# Загрузки: ./data/media → Transmission /downloads (complete/incomplete), Jellyfin /media (библиотека /media/complete).
+#
+# После первого запуска:
+# - Jellyfin: Dashboard → Networking → Base URL → /jellyfin
+# - Prowlarr: Settings → General → URL Base → /prowlarr
+# - Transmission HOST whitelist: см. TRANSMISSION_HOST_WHITELIST / PUBLIC_HOSTNAME в .env
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    restart: unless-stopped
+    volumes:
+      - ./config/jellyfin:/config
+      - ./data/media:/media
+    networks: [stack]
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-UTC}
+      - USER=${TRANSMISSION_USER:-admin}
+      - PASS=${TRANSMISSION_PASS:-changeme}
+      - TRANSMISSION_WEB_HOME=/transmissionic-web
+      - HOST_WHITELIST=${TRANSMISSION_HOST_WHITELIST:-${PUBLIC_HOSTNAME:-}}
+      - WHITELIST=${TRANSMISSION_RPC_WHITELIST:-}
+      - PEERPORT=${TRANSMISSION_PEER_PORT:-51413}
+    volumes:
+      - ./config/transmission:/config
+      - ./data/media:/downloads
+      - ./config/transmissionic-web:/transmissionic-web:ro
+    ports:
+      - "${TRANSMISSION_PEER_PORT:-51413}:51413/tcp"
+      - "${TRANSMISSION_PEER_PORT:-51413}:51413/udp"
+    networks: [stack]
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-UTC}
+    volumes:
+      - ./config/prowlarr:/config
+    networks: [stack]
+
+  gateway:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "${EDGE_HTTP_PORT:-8080}:80"
+    volumes:
+      - ./${CADDY_PRIMARY_FILE:-Caddyfile}:/etc/caddy/Caddyfile:ro
+      - ./caddy/snippets:/etc/caddy/snippets:ro
+      - ./www:/srv:ro
+    depends_on:
+      - jellyfin
+      - transmission
+      - prowlarr
+    networks: [stack]
+
+networks:
+  stack:
+    driver: bridge
