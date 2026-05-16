@@ -62,14 +62,8 @@ if ! docker info >/dev/null 2>&1; then
 	exit 1
 fi
 
-PEER="$(grep -E '^ARIA2_PEER_PORT=' .env | cut -d= -f2- | tr -d '\r' || true)"
+PEER="$(grep -E '^TORRENT_PEER_PORT=' .env | cut -d= -f2- | tr -d '\r' || true)"
 PEER="${PEER:-6881}"
-
-ARIA2_RPC_SECRET="$(grep -E '^ARIA2_RPC_SECRET=' .env | cut -d= -f2- | tr -d '\r' || true)"
-if [[ -z "${ARIA2_RPC_SECRET// /}" || "$ARIA2_RPC_SECRET" == "change-me" ]]; then
-	echo "В .env задайте ARIA2_RPC_SECRET (не change-me)." >&2
-	exit 1
-fi
 
 PH="$(grep -E '^PUBLIC_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 LFT="$(grep -E '^PROWLARR_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
@@ -84,10 +78,9 @@ echo "Готово. Проверьте DNS (A/AAAA на IP этого серве
 echo "  ${PH}, ${LFT}, ${MMD}, ${WV}"
 echo ""
 echo "Портал: https://${PH}/"
-echo "Prowlarr: https://${LFT}/  |  AriaNg: https://${MMD}/  |  Jellyfin: https://${WV}/"
+echo "Prowlarr: https://${LFT}/  |  Flood: https://${MMD}/  |  Jellyfin: https://${WV}/"
 echo ""
-echo "AriaNg → Aria2 RPC: https://${MMD}/jsonrpc, secret из ARIA2_RPC_SECRET."
-echo "Prowlarr → Aria2: хост aria2, порт 6800, secret из ARIA2_RPC_SECRET."
+echo "Flood/Prowlarr → qBittorrent: хост qbittorrent, порт 8080, username admin, пароль Web UI из логов qbittorrent."
 echo "В Jellyfin/Prowlarr при поддоменах Base URL и URL Base оставьте пустыми."
 echo "Фаервол (если есть): TCP 80, 443 и TCP+UDP ${PEER} для торрентов."
 echo ""

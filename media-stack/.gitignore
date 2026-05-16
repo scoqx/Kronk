@@ -3,5 +3,7 @@ data/
 config/jellyfin/
 config/deluge/
 config/aria2/
+config/flood/
+config/qbittorrent/
 config/prowlarr/
 caddy/passwords.txt

@@ -1,12 +1,13 @@
-# Один внешний вход (gateway): локально — главная и сервисы по префиксам /jellyfin /prowlarr /aria2 (caddy/snippets/site.caddy).
+# Один внешний вход (gateway): локально — главная и сервисы по префиксам /jellyfin /prowlarr /flood (caddy/snippets/site.caddy).
 # На сервере: CADDY_PRIMARY_FILE=Caddyfile.server + docker-compose.server.yml — отдельный FQDN на портал и на каждый сервис (см. caddy/snippets/site-subdomains.caddy).
 #
-# Загрузки: ./data/media → Aria2 /downloads и Jellyfin /media (библиотека в /media/complete).
+# Загрузки: ./data/media → qBittorrent /downloads и Jellyfin /media (библиотека в /media/complete).
 #
 # После первого запуска:
-# - Локально: Jellyfin Base URL /jellyfin; Prowlarr URL Base /prowlarr. AriaNg UI — по /aria2/
-# - Прод с поддоменами: Base URL / URL Base у Jellyfin/Prowlarr пустые; AriaNg UI на поддомене (см. .env.server.example).
-# - Prowlarr → Aria2 (внутри Docker): хост aria2, порт 6800, secret из ARIA2_RPC_SECRET.
+# - Локально: Jellyfin Base URL /jellyfin; Prowlarr URL Base /prowlarr. Flood UI — по /flood/
+# - Прод с поддоменами: Base URL / URL Base у Jellyfin/Prowlarr пустые; Flood UI на поддомене (см. .env.server.example).
+# - Flood → qBittorrent: URL http://qbittorrent:8080, username admin, временный пароль в логах qbittorrent.
+# - Prowlarr → qBittorrent: хост qbittorrent, порт 8080, username admin, пароль qBittorrent Web UI.
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
@@ -16,30 +17,32 @@ services:
       - ./data/media:/media
     networks: [stack]
 
-  aria2:
-    image: p3terx/aria2-pro:latest
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
     restart: unless-stopped
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
-      - UMASK_SET=${UMASK_SET:-022}
-      - RPC_SECRET=${ARIA2_RPC_SECRET:?Set ARIA2_RPC_SECRET in .env}
-      - RPC_PORT=6800
-      - LISTEN_PORT=${ARIA2_PEER_PORT:-6881}
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=${TORRENT_PEER_PORT:-6881}
     volumes:
-      - ./config/aria2:/config
+      - ./config/qbittorrent:/config
       - ./data/media:/downloads
     ports:
-      - "${ARIA2_PEER_PORT:-6881}:${ARIA2_PEER_PORT:-6881}/tcp"
-      - "${ARIA2_PEER_PORT:-6881}:${ARIA2_PEER_PORT:-6881}/udp"
+      - "${TORRENT_PEER_PORT:-6881}:${TORRENT_PEER_PORT:-6881}/tcp"
+      - "${TORRENT_PEER_PORT:-6881}:${TORRENT_PEER_PORT:-6881}/udp"
     networks: [stack]
 
-  aria2-ui:
-    image: p3terx/ariang:latest
+  flood:
+    image: jesec/flood:latest
     restart: unless-stopped
+    command: ["--host", "0.0.0.0", "--port", "3000", "--allowedpath", "/downloads"]
+    volumes:
+      - ./config/flood:/home/download/.local/share/flood
+      - ./data/media:/downloads
     depends_on:
-      - aria2
+      - qbittorrent
     networks: [stack]
 
   prowlarr:
@@ -70,8 +73,8 @@ services:
       - ./www:/srv:ro
     depends_on:
       - jellyfin
-      - aria2
-      - aria2-ui
+      - qbittorrent
+      - flood
       - prowlarr
     networks: [stack]
 

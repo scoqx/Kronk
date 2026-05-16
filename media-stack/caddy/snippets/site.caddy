@@ -23,25 +23,12 @@ handle /prowlarr/* {
 	}
 }
 
-handle /aria2 {
-	redir /aria2/ 308
+handle /flood {
+	redir /flood/ 308
 }
-handle /aria2/jsonrpc {
-	uri strip_prefix /aria2
-	reverse_proxy aria2:6800 {
-		header_up Host {http.request.host}
-	}
-}
-handle /aria2/json {
-	uri strip_prefix /aria2
-	rewrite * /jsonrpc
-	reverse_proxy aria2:6800 {
-		header_up Host {http.request.host}
-	}
-}
-handle /aria2/* {
-	uri strip_prefix /aria2
-	reverse_proxy aria2-ui:6880 {
+handle /flood/* {
+	uri strip_prefix /flood
+	reverse_proxy flood:3000 {
 		header_up Host {http.request.host}
 	}
 }
