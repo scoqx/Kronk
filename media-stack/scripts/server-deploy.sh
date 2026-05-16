@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Деплой на VPS: HTTPS на нескольких FQDN (Caddy + Let's Encrypt), поддомены для сервисов.
+# Деплой на VPS: HTTPS на нескольких FQDN (Caddy + Let's Encrypt).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -17,7 +17,7 @@ done
 if [[ ! -f .env ]]; then
 	echo "Нет .env — скопируйте шаблон:" >&2
 	echo "  cp .env.server.example .env" >&2
-	echo "Заполните PUBLIC_HOSTNAME, PROWLARR_*, TRANSMISSION_*, JELLYFIN_*, TRANSMISSION_PASS, TRANSMISSION_HOST_WHITELIST." >&2
+	echo "Заполните PUBLIC_HOSTNAME, PROWLARR_HOSTNAME, DELUGE_HOSTNAME, JELLYFIN_HOSTNAME." >&2
 	exit 1
 fi
 
@@ -34,7 +34,7 @@ require_env_var() {
 
 require_env_var PUBLIC_HOSTNAME
 require_env_var PROWLARR_HOSTNAME
-require_env_var TRANSMISSION_HOSTNAME
+require_env_var DELUGE_HOSTNAME
 require_env_var JELLYFIN_HOSTNAME
 
 if ! grep -qE '^CADDY_PRIMARY_FILE=Caddyfile\.server' .env 2>/dev/null; then
@@ -62,16 +62,13 @@ if ! docker info >/dev/null 2>&1; then
 	exit 1
 fi
 
-PEER="$(grep -E '^TRANSMISSION_PEER_PORT=' .env | cut -d= -f2- | tr -d '\r' || true)"
-PEER="${PEER:-51413}"
+PEER="$(grep -E '^DELUGE_PEER_PORT=' .env | cut -d= -f2- | tr -d '\r' || true)"
+PEER="${PEER:-6881}"
 
 PH="$(grep -E '^PUBLIC_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 LFT="$(grep -E '^PROWLARR_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
-MMD="$(grep -E '^TRANSMISSION_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
+MMD="$(grep -E '^DELUGE_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 WV="$(grep -E '^JELLYFIN_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
-
-chmod +x scripts/bootstrap-transmissionic.sh 2>/dev/null || true
-./scripts/bootstrap-transmissionic.sh
 
 "${DC[@]}" -f docker-compose.yml -f docker-compose.server.yml pull
 "${DC[@]}" -f docker-compose.yml -f docker-compose.server.yml up -d --remove-orphans
@@ -81,9 +78,10 @@ echo "Готово. Проверьте DNS (A/AAAA на IP этого серве
 echo "  ${PH}, ${LFT}, ${MMD}, ${WV}"
 echo ""
 echo "Портал: https://${PH}/"
-echo "Prowlarr: https://${LFT}/  |  Transmission web: https://${MMD}/transmission/web/  |  Jellyfin: https://${WV}/"
+echo "Prowlarr: https://${LFT}/  |  Deluge Web: https://${MMD}/  |  Jellyfin: https://${WV}/"
 echo ""
-echo "После перехода с путей на поддомены: в Prowlarr очистите URL Base, в Jellyfin — Base URL (пусто)."
+echo "Prowlarr → Download Client: Deluge, хост deluge, порт 58846 (daemon), пароль — как в Deluge UI (Preferences → Daemon)."
+echo "В Jellyfin/Prowlarr при поддоменах Base URL и URL Base оставьте пустыми."
 echo "Фаервол (если есть): TCP 80, 443 и TCP+UDP ${PEER} для торрентов."
 echo ""
 echo "Логи gateway: docker compose -f docker-compose.yml -f docker-compose.server.yml logs -f gateway"

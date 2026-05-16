@@ -1,8 +1,10 @@
 # Прод: отдельные поддомены (TLS на каждом). Переменные — в env контейнера gateway (см. docker-compose.server.yml).
-# Портал: только статика; Prowlarr / Jellyfin — корень бэкенда; Transmission — префикс /transmission/ как у образа linuxserver.
+# Портал: статика; Prowlarr / Jellyfin / Deluge Web — корень бэкенда (:9696 / :8096 / :8112).
 
 {$PUBLIC_HOSTNAME} {
 	import common.caddy
+	# Чтобы браузер не показывал старый index.html после деплоя
+	header Cache-Control "no-cache, must-revalidate"
 	root * /srv
 	file_server
 }
@@ -14,15 +16,10 @@
 	}
 }
 
-{$TRANSMISSION_HOSTNAME} {
+{$DELUGE_HOSTNAME} {
 	import common.caddy
-	handle /transmission/* {
-		reverse_proxy transmission:9091 {
-			header_up Host {http.request.host}
-		}
-	}
-	handle {
-		redir /transmission/web/ 308
+	reverse_proxy deluge:8112 {
+		header_up Host {http.request.host}
 	}
 }
 

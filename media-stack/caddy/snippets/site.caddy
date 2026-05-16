@@ -23,11 +23,12 @@ handle /prowlarr/* {
 	}
 }
 
-handle /transmission {
-	redir /transmission/ 308
+handle /deluge {
+	redir /deluge/ 308
 }
-handle /transmission/* {
-	reverse_proxy transmission:9091 {
+handle /deluge/* {
+	uri strip_prefix /deluge
+	reverse_proxy deluge:8112 {
 		header_up Host {http.request.host}
 	}
 }

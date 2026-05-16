@@ -1,8 +1,6 @@
 .env
 data/
 config/jellyfin/
-config/transmission/
+config/deluge/
 config/prowlarr/
-config/transmissionic-web/*
-!config/transmissionic-web/.gitkeep
 caddy/passwords.txt

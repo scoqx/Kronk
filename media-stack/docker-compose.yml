@@ -1,11 +1,12 @@
-# Один внешний вход (gateway): локально — главная и сервисы по префиксам /jellyfin /prowlarr /transmission (caddy/snippets/site.caddy).
+# Один внешний вход (gateway): локально — главная и сервисы по префиксам /jellyfin /prowlarr /deluge (caddy/snippets/site.caddy).
 # На сервере: CADDY_PRIMARY_FILE=Caddyfile.server + docker-compose.server.yml — отдельный FQDN на портал и на каждый сервис (см. caddy/snippets/site-subdomains.caddy).
 #
-# Загрузки: ./data/media → Transmission /downloads (complete/incomplete), Jellyfin /media (библиотека /media/complete).
+# Загрузки: ./data/media → Deluge /downloads и Jellyfin /media (библиотека в /media/complete).
 #
 # После первого запуска:
-# - Локально: Jellyfin Base URL /jellyfin; Prowlarr URL Base /prowlarr.
-# - Прод с поддоменами: Base URL / URL Base пустые; TRANSMISSION_HOST_WHITELIST — все FQDN (портал + поддомены), см. .env.server.example.
+# - Локально: Jellyfin Base URL /jellyfin; Prowlarr URL Base /prowlarr. Deluge Web — по /deluge/
+# - Прод с поддоменами: Base URL / URL Base у Jellyfin/Prowlarr пустые; веб Deluge на поддомене (см. .env.server.example).
+# - Prowlarr → Deluge (внутри Docker): хост deluge, порт 58846 (daemon), пароль как в Deluge (Settings → Daemon).
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
@@ -15,27 +16,20 @@ services:
       - ./data/media:/media
     networks: [stack]
 
-  transmission:
-    image: lscr.io/linuxserver/transmission:latest
+  deluge:
+    image: lscr.io/linuxserver/deluge:latest
     restart: unless-stopped
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
-      - USER=${TRANSMISSION_USER:-admin}
-      - PASS=${TRANSMISSION_PASS:-changeme}
-      - TRANSMISSION_WEB_HOME=/transmissionic-web
-      # Прод с поддоменами: задайте список через запятую (портал + каждый сервис). Если пусто — только PUBLIC_HOSTNAME.
-      - HOST_WHITELIST=${TRANSMISSION_HOST_WHITELIST:-${PUBLIC_HOSTNAME:-}}
-      - WHITELIST=${TRANSMISSION_RPC_WHITELIST:-}
-      - PEERPORT=${TRANSMISSION_PEER_PORT:-51413}
+      - DELUGE_LOGLEVEL=${DELUGE_LOGLEVEL:-info}
     volumes:
-      - ./config/transmission:/config
+      - ./config/deluge:/config
       - ./data/media:/downloads
-      - ./config/transmissionic-web:/transmissionic-web:ro
     ports:
-      - "${TRANSMISSION_PEER_PORT:-51413}:51413/tcp"
-      - "${TRANSMISSION_PEER_PORT:-51413}:51413/udp"
+      - "${DELUGE_PEER_PORT:-6881}:6881/tcp"
+      - "${DELUGE_PEER_PORT:-6881}:6881/udp"
     networks: [stack]
 
   prowlarr:
@@ -66,7 +60,7 @@ services:
       - ./www:/srv:ro
     depends_on:
       - jellyfin
-      - transmission
+      - deluge
       - prowlarr
     networks: [stack]
 

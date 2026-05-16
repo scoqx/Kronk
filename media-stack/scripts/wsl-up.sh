@@ -35,11 +35,8 @@ fi
 
 if [[ ! -f .env ]]; then
 	cp .env.example .env
-	echo "Создан .env из .env.example — при необходимости отредактируйте пароли."
+	echo "Создан .env из .env.example — при необходимости отредактируйте."
 fi
-
-chmod +x scripts/bootstrap-transmissionic.sh 2>/dev/null || true
-./scripts/bootstrap-transmissionic.sh
 
 "${DC[@]}" up -d --remove-orphans
 
@@ -49,10 +46,11 @@ grep -q '^EDGE_HTTP_PORT=' .env 2>/dev/null && PORT="$(grep -E '^EDGE_HTTP_PORT=
 
 echo ""
 echo "Поднято. Откройте в браузере:"
-echo "  http://${HOST}:${PORT}/              — портал"
+echo "  http://${HOST}:${PORT}/           — портал"
 echo "  http://${HOST}:${PORT}/prowlarr/"
-echo "  http://${HOST}:${PORT}/transmission/web/"
+echo "  http://${HOST}:${PORT}/deluge/"
 echo "  http://${HOST}:${PORT}/jellyfin/"
 echo ""
 echo "С Windows браузера часто работает localhost:${PORT}; с телефона — IP ПК и тот же порт."
 echo "Первый раз: Jellyfin Base URL /jellyfin, Prowlarr URL Base /prowlarr."
+echo "Prowlarr → Deluge: хост deluge, порт 58846, пароль из Deluge (Daemon)."
