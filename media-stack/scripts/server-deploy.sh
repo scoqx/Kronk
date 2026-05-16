@@ -71,7 +71,7 @@ MMD="$(grep -E '^DELUGE_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 WV="$(grep -E '^JELLYFIN_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 
 "${DC[@]}" -f docker-compose.yml -f docker-compose.server.yml pull
-"${DC[@]}" -f docker-compose.yml -f docker-compose.server.yml up -d --remove-orphans
+"${DC[@]}" -f docker-compose.yml -f docker-compose.server.yml up -d --build --remove-orphans
 
 echo ""
 echo "Готово. Проверьте DNS (A/AAAA на IP этого сервера):"
