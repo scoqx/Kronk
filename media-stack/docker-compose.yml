@@ -3,10 +3,15 @@
 #
 # Загрузки: ./data/media → Deluge /downloads и Jellyfin /media (библиотека в /media/complete).
 #
+# Исходящий трафик Deluge (торренты): контейнер deluge использует сетевой стек sidecar deluge-net (sing-box + TUN).
+# Конфиг: config/sing-box/config.json (по умолчанию — без VPN, только маршрутизация через TUN). Для Hysteria 2 см. config.hysteria2.example.json.
+# Sidecar нужен Linux и /dev/net/tun (типичный VPS). Локально на Docker Desktop без TUN может не стартовать — временно закомментируйте deluge-net и верните deluge в networks: [stack] и порты, как в истории git.
+#
 # После первого запуска:
 # - Локально: Jellyfin Base URL /jellyfin; Prowlarr URL Base /prowlarr. Deluge Web — по /deluge/
 # - Прод с поддоменами: Base URL / URL Base у Jellyfin/Prowlarr пустые; веб Deluge на поддомене (см. .env.server.example).
-# - Prowlarr → Deluge (внутри Docker): хост deluge, порт 58846 (daemon), пароль как в Deluge (Settings → Daemon).
+# - Prowlarr → Deluge (внутри Docker): хост deluge-net, порт 58846 (daemon), пароль daemon — в Deluge Preferences → Daemon (после входа в Web UI).
+# - Deluge Web UI (linuxserver): первый вход по умолчанию admin / deluge — смените: Preferences → Interface → Password.
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
@@ -16,9 +21,30 @@ services:
       - ./data/media:/media
     networks: [stack]
 
+  deluge-net:
+    image: ghcr.io/sagernet/sing-box:latest
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    volumes:
+      - ./config/sing-box:/etc/sing-box:ro
+    command: ["run", "-c", "/etc/sing-box/config.json"]
+    networks: [stack]
+    ports:
+      - "${DELUGE_PEER_PORT:-6881}:6881/tcp"
+      - "${DELUGE_PEER_PORT:-6881}:6881/udp"
+
   deluge:
+    # Первый вход в веб: admin / deluge (см. https://docs.linuxserver.io/images/docker-deluge/ ). Пароль сменить в UI.
     image: lscr.io/linuxserver/deluge:latest
     restart: unless-stopped
+    network_mode: "service:deluge-net"
+    depends_on:
+      - deluge-net
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
@@ -27,10 +53,6 @@ services:
     volumes:
       - ./config/deluge:/config
       - ./data/media:/downloads
-    ports:
-      - "${DELUGE_PEER_PORT:-6881}:6881/tcp"
-      - "${DELUGE_PEER_PORT:-6881}:6881/udp"
-    networks: [stack]
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -60,6 +82,7 @@ services:
       - ./www:/srv:ro
     depends_on:
       - jellyfin
+      - deluge-net
       - deluge
       - prowlarr
     networks: [stack]
