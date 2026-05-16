@@ -37,9 +37,9 @@ services:
   flood:
     image: jesec/flood:latest
     restart: unless-stopped
-    command: ["--host", "0.0.0.0", "--port", "3000", "--allowedpath", "/downloads"]
+    command: ["--host", "0.0.0.0", "--port", "3000", "--rundir", "/config/flood", "--allowedpath", "/downloads"]
     volumes:
-      - ./config/flood:/home/download/.local/share/flood
+      - ./config/flood:/config/flood
       - ./data/media:/downloads
     depends_on:
       - qbittorrent
