@@ -1,6 +1,5 @@
-# Прод: один хост с автоматическим HTTPS (Let's Encrypt), если PUBLIC_HOSTNAME задан в env контейнера gateway.
-# Важно: DNS A/AAAA этого имени должен указывать на сервер до первого запуска.
+# Прод: портал + три сервиса на своих FQDN; автоматический HTTPS (Let's Encrypt) на каждом имени.
+# В .env задайте PUBLIC_HOSTNAME, PROWLARR_HOSTNAME, TRANSMISSION_HOSTNAME, JELLYFIN_HOSTNAME (и DNS A/AAAA на сервер).
+# Локально по-прежнему Caddyfile + snippets/site.caddy (пути /prowlarr и т.д.).
 
-{$PUBLIC_HOSTNAME} {
-	import snippets/site.caddy
-}
+import snippets/site-subdomains.caddy

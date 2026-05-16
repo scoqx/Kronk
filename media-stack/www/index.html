@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-portal-domain="super.scox.space">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -102,41 +102,74 @@
 <body>
 	<main>
 		<h1>Домашний медиа-стек</h1>
-		<p class="lead">Один адрес (один домен / один порт на входе): главная — эта страница; поиск, торренты и просмотр — по относительным путям ниже.</p>
+		<p class="lead" id="lead-text">Локально: сервисы по путям ниже. На проде с поддоменами: с этой страницы (портал) ссылки ведут на отдельные имена — см. подписи у кнопок.</p>
 
 		<div class="grid">
-			<a class="tile" href="/prowlarr/" rel="noopener">
+			<a class="tile" id="link-prowlarr" href="/prowlarr/" rel="noopener">
 				<div>
 					<div class="tile-title">Поиск по трекерам</div>
-					<div class="tile-sub">Prowlarr · индексаторы и отправка в клиент</div>
+					<div class="tile-sub" data-sub-desc hidden>Prowlarr (поддомен)</div>
+					<div class="tile-sub path-desc">Prowlarr · индексаторы и отправка в клиент</div>
 				</div>
 				<div class="chev">→</div>
 			</a>
-			<a class="tile" href="/transmission/web/" rel="noopener">
+			<a class="tile" id="link-transmission" href="/transmission/web/" rel="noopener">
 				<div>
 					<div class="tile-title">Торренты</div>
-					<div class="tile-sub">Transmission / Transmissionic · загрузки и магнеты</div>
+					<div class="tile-sub" data-sub-desc hidden>Transmission (поддомен)</div>
+					<div class="tile-sub path-desc">Transmission / Transmissionic · загрузки и магнеты</div>
 				</div>
 				<div class="chev">→</div>
 			</a>
-			<a class="tile" href="/jellyfin/" rel="noopener">
+			<a class="tile" id="link-jellyfin" href="/jellyfin/" rel="noopener">
 				<div>
 					<div class="tile-title">Медиасервер</div>
-					<div class="tile-sub">Jellyfin · библиотека из папки загрузок</div>
+					<div class="tile-sub" data-sub-desc hidden>Jellyfin (поддомен)</div>
+					<div class="tile-sub path-desc">Jellyfin · библиотека из папки загрузок</div>
 				</div>
 				<div class="chev">→</div>
 			</a>
 		</div>
 
-		<footer>
-			<div>Один адрес в браузере: <code id="origin-hint"></code> — сервисы на префиксах <code>/prowlarr/</code>, <code>/transmission/</code>, <code>/jellyfin/</code> (локально обычно <code>http://</code>, на сервере — <code>https://</code>).</div>
-			<div style="margin-top:8px;">Один раз настройте приложения: Jellyfin — Base URL <code>/jellyfin</code>; Prowlarr — URL Base <code>/prowlarr</code>. Иначе интерфейсы соберут не те пути.</div>
-			<div style="margin-top:8px;">Prowlarr → Transmission (внутри Docker): хост <code>transmission</code>, порт <code>9091</code>, логин/пароль из <code>.env</code>, при необходимости URL Base <code>/transmission/</code>.</div>
-			<div style="margin-top:8px;">Доступ по имени домена: добавьте домен в <code>TRANSMISSION_HOST_WHITELIST</code> в <code>.env</code>, чтобы не резало RPC.</div>
+		<footer id="footer-hint">
+			<div>Локально: откройте <code id="origin-hint"></code> и используйте <code>/prowlarr/</code>, <code>/transmission/</code>, <code>/jellyfin/</code>.</div>
+			<div style="margin-top:8px;">Прод (поддомены): задайте на <code>&lt;html data-portal-domain="…"&gt;</code> тот же FQDN, что <code>PUBLIC_HOSTNAME</code> в <code>.env</code> (сейчас по умолчанию <code>super.scox.space</code>). Префиксы поддоменов задаются в Caddy и <code>.env</code> (<code>lft</code> / <code>mmd</code> / <code>wwv</code>).</div>
+			<div style="margin-top:8px;">Jellyfin / Prowlarr за обратным прокси: локально — Base URL / URL Base с префиксом; на поддоменах — поля пустые.</div>
+			<div style="margin-top:8px;">Prowlarr → Transmission из Docker: хост <code>transmission</code>, порт <code>9091</code>, логин/пароль из <code>.env</code>.</div>
+			<div style="margin-top:8px;">Transmission: перечислите все веб-имена в <code>TRANSMISSION_HOST_WHITELIST</code>.</div>
 		</footer>
 	</main>
 	<script>
-		document.getElementById("origin-hint").textContent = location.origin || "";
+		(function () {
+			var originEl = document.getElementById("origin-hint");
+			if (originEl) originEl.textContent = location.origin || "";
+
+			var portal = document.documentElement.getAttribute("data-portal-domain");
+			// Если открыт портал (тот же hostname, что PUBLIC_HOSTNAME в .env) — ссылки на поддомены lft/mmd/wwv.
+			if (portal && location.hostname === portal && portal.indexOf(".") !== -1) {
+				var zone = portal;
+				var map = {
+					"link-prowlarr": "https://lft." + zone + "/",
+					"link-transmission": "https://mmd." + zone + "/transmission/web/",
+					"link-jellyfin": "https://wwv." + zone + "/"
+				};
+				Object.keys(map).forEach(function (id) {
+					var a = document.getElementById(id);
+					if (a) a.setAttribute("href", map[id]);
+				});
+				document.querySelectorAll("[data-sub-desc]").forEach(function (el) {
+					el.hidden = false;
+				});
+				document.querySelectorAll(".path-desc").forEach(function (el) {
+					el.hidden = true;
+				});
+				var lead = document.getElementById("lead-text");
+				if (lead) {
+					lead.textContent =
+						"Портал на этом домене; поиск, клиент и просмотр — на поддоменах lft / mmd / wwv (см. ссылки).";
+				}
+			}
+		})();
 	</script>
 </body>
 </html>

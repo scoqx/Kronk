@@ -1,0 +1,38 @@
+# Прод: отдельные поддомены (TLS на каждом). Переменные — в env контейнера gateway (см. docker-compose.server.yml).
+# Портал: только статика; Prowlarr / Jellyfin — корень бэкенда; Transmission — префикс /transmission/ как у образа linuxserver.
+
+{$PUBLIC_HOSTNAME} {
+	import snippets/common.caddy
+	root * /srv
+	file_server
+}
+
+{$PROWLARR_HOSTNAME} {
+	import snippets/common.caddy
+	reverse_proxy prowlarr:9696 {
+		header_up Host {http.request.host}
+	}
+}
+
+{$TRANSMISSION_HOSTNAME} {
+	import snippets/common.caddy
+	handle /transmission/* {
+		reverse_proxy transmission:9091 {
+			header_up Host {http.request.host}
+		}
+	}
+	handle {
+		redir /transmission/web/ 308
+	}
+}
+
+{$JELLYFIN_HOSTNAME} {
+	import snippets/common.caddy
+	reverse_proxy jellyfin:8096 {
+		header_up Host {http.request.host}
+		flush_interval -1
+		transport http {
+			read_timeout 0
+		}
+	}
+}

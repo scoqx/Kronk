@@ -1,13 +1,11 @@
-# Один внешний вход (gateway): главная — статическая страница; сервисы по префиксам /jellyfin /prowlarr /transmission.
-# Caddy: локально см. Caddyfile; на сервере с TLS — CADDY_PRIMARY_FILE=Caddyfile.server и docker-compose.server.yml.
-# Общие директивы: caddy/snippets/site.caddy
+# Один внешний вход (gateway): локально — главная и сервисы по префиксам /jellyfin /prowlarr /transmission (caddy/snippets/site.caddy).
+# На сервере: CADDY_PRIMARY_FILE=Caddyfile.server + docker-compose.server.yml — отдельный FQDN на портал и на каждый сервис (см. caddy/snippets/site-subdomains.caddy).
 #
 # Загрузки: ./data/media → Transmission /downloads (complete/incomplete), Jellyfin /media (библиотека /media/complete).
 #
 # После первого запуска:
-# - Jellyfin: Dashboard → Networking → Base URL → /jellyfin
-# - Prowlarr: Settings → General → URL Base → /prowlarr
-# - Transmission HOST whitelist: см. TRANSMISSION_HOST_WHITELIST / PUBLIC_HOSTNAME в .env
+# - Локально: Jellyfin Base URL /jellyfin; Prowlarr URL Base /prowlarr.
+# - Прод с поддоменами: Base URL / URL Base пустые; TRANSMISSION_HOST_WHITELIST — все FQDN (портал + поддомены), см. .env.server.example.
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
@@ -27,6 +25,7 @@ services:
       - USER=${TRANSMISSION_USER:-admin}
       - PASS=${TRANSMISSION_PASS:-changeme}
       - TRANSMISSION_WEB_HOME=/transmissionic-web
+      # Прод с поддоменами: задайте список через запятую (портал + каждый сервис). Если пусто — только PUBLIC_HOSTNAME.
       - HOST_WHITELIST=${TRANSMISSION_HOST_WHITELIST:-${PUBLIC_HOSTNAME:-}}
       - WHITELIST=${TRANSMISSION_RPC_WHITELIST:-}
       - PEERPORT=${TRANSMISSION_PEER_PORT:-51413}
