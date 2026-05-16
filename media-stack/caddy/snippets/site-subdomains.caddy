@@ -5,6 +5,10 @@
 	import common.caddy
 	# Чтобы браузер не показывал старый index.html после деплоя
 	header Cache-Control "no-cache, must-revalidate"
+	handle /api/rutracker/* {
+		uri strip_prefix /api/rutracker
+		reverse_proxy rutracker-api:8000
+	}
 	root * /srv
 	file_server
 }

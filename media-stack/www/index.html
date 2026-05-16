@@ -48,7 +48,7 @@
 			padding: clamp(20px, 4vw, 40px);
 		}
 		.panel {
-			width: min(420px, 100%);
+			width: min(680px, 100%);
 			padding: clamp(28px, 5vw, 40px);
 			border-radius: 24px;
 			background: var(--glass);
@@ -75,6 +75,125 @@
 				background-clip: text;
 				color: transparent;
 			}
+		}
+		.search {
+			display: grid;
+			gap: 12px;
+			margin-bottom: 22px;
+		}
+		.search-row {
+			display: flex;
+			gap: 10px;
+		}
+		.search-input {
+			width: 100%;
+			min-width: 0;
+			padding: 16px 18px;
+			border: 1px solid var(--stroke);
+			border-radius: 16px;
+			color: var(--text);
+			background: rgba(255, 255, 255, 0.05);
+			font: inherit;
+			outline: none;
+			transition: border-color 0.2s ease, box-shadow 0.2s ease;
+		}
+		.search-input::placeholder { color: var(--dim); }
+		.search-input:focus {
+			border-color: color-mix(in oklab, var(--accent) 55%, var(--stroke));
+			box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 16%, transparent);
+		}
+		.search-submit,
+		.source-button {
+			border: 1px solid var(--stroke);
+			color: var(--text);
+			background: rgba(255, 255, 255, 0.06);
+			font: inherit;
+			cursor: pointer;
+			transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+		}
+		.search-submit {
+			padding: 0 18px;
+			border-radius: 16px;
+			font-weight: 600;
+			white-space: nowrap;
+		}
+		.source-grid {
+			display: grid;
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+			gap: 8px;
+		}
+		.source-button {
+			min-height: 44px;
+			padding: 10px 8px;
+			border-radius: 14px;
+			font-weight: 600;
+		}
+		.search-submit:hover,
+		.source-button:hover:not(:disabled) {
+			transform: translateY(-1px);
+			border-color: color-mix(in oklab, var(--accent) 45%, var(--stroke));
+		}
+		.source-button[aria-pressed="true"] {
+			border-color: color-mix(in oklab, var(--accent) 70%, var(--stroke));
+			background: linear-gradient(145deg, color-mix(in oklab, var(--accent) 22%, transparent), color-mix(in oklab, var(--accent2) 16%, transparent));
+		}
+		.source-button:disabled {
+			cursor: not-allowed;
+			opacity: 0.45;
+		}
+		.search-submit:focus-visible,
+		.source-button:focus-visible {
+			outline: 2px solid var(--accent);
+			outline-offset: 3px;
+		}
+		.results {
+			display: none;
+			margin: 2px 0 22px;
+			padding: 14px;
+			border: 1px solid var(--stroke);
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.03);
+		}
+		.results.is-visible { display: block; }
+		.results-status {
+			margin: 0;
+			color: var(--dim);
+			font-size: 0.95rem;
+		}
+		.results-list {
+			display: grid;
+			gap: 10px;
+			margin: 12px 0 0;
+			padding: 0;
+			list-style: none;
+		}
+		.result-link {
+			display: grid;
+			gap: 6px;
+			padding: 12px;
+			border-radius: 14px;
+			color: inherit;
+			text-decoration: none;
+			background: rgba(255, 255, 255, 0.04);
+			border: 1px solid transparent;
+		}
+		.result-link:hover,
+		.result-link:focus-visible {
+			border-color: color-mix(in oklab, var(--accent) 45%, var(--stroke));
+			outline: none;
+		}
+		.result-title {
+			font-weight: 600;
+			line-height: 1.25;
+		}
+		.result-meta {
+			color: var(--dim);
+			font-size: 0.9rem;
+		}
+		@media (max-width: 560px) {
+			.search-row { flex-direction: column; }
+			.search-submit { min-height: 48px; }
+			.source-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 		}
 		.tiles {
 			display: grid;
@@ -131,6 +250,22 @@
 <body>
 	<div class="panel">
 		<h1 class="brand" id="brand">super.scox.space</h1>
+		<form class="search" id="search-form">
+			<div class="search-row">
+				<input class="search-input" id="search-input" name="q" type="search" autocomplete="off" minlength="2" placeholder="Найти раздачу" required />
+				<button class="search-submit" type="submit">Искать</button>
+			</div>
+			<div class="source-grid" aria-label="Источники поиска">
+				<button class="source-button" type="button" data-source="rutracker" aria-pressed="true">RuTracker</button>
+				<button class="source-button" type="button" data-source="prowlarr" aria-pressed="false">Индексатор</button>
+				<button class="source-button" type="button" disabled title="Источник будет добавлен позже">Источник 3</button>
+				<button class="source-button" type="button" disabled title="Источник будет добавлен позже">Источник 4</button>
+			</div>
+		</form>
+		<section class="results" id="results" aria-live="polite">
+			<p class="results-status" id="results-status"></p>
+			<ul class="results-list" id="results-list"></ul>
+		</section>
 		<nav class="tiles" aria-label="Сервисы">
 			<a class="tile" id="link-prowlarr" href="/prowlarr/" rel="noopener">
 				<span class="tile-icon" aria-hidden="true">⌕</span>
@@ -169,6 +304,105 @@
 					if (el) el.setAttribute("href", m[id]);
 				});
 			}
+
+			var selectedSource = "rutracker";
+			var form = document.getElementById("search-form");
+			var input = document.getElementById("search-input");
+			var results = document.getElementById("results");
+			var status = document.getElementById("results-status");
+			var list = document.getElementById("results-list");
+			var buttons = document.querySelectorAll(".source-button[data-source]");
+
+			function setSource(source) {
+				selectedSource = source;
+				buttons.forEach(function (button) {
+					button.setAttribute("aria-pressed", button.dataset.source === source ? "true" : "false");
+				});
+			}
+
+			function showStatus(message) {
+				results.classList.add("is-visible");
+				status.textContent = message;
+			}
+
+			function clearResults() {
+				list.textContent = "";
+			}
+
+			function prowlarrSearchUrl(query) {
+				var link = document.getElementById("link-prowlarr");
+				var base = link ? link.getAttribute("href") : "/prowlarr/";
+				var separator = base.indexOf("?") === -1 ? "?" : "&";
+				return base.replace(/\/?$/, "/") + "search" + separator + "term=" + encodeURIComponent(query);
+			}
+
+			function renderResults(items) {
+				clearResults();
+				if (!items.length) {
+					showStatus("Ничего не найдено.");
+					return;
+				}
+
+				showStatus("Найдено: " + items.length);
+				items.forEach(function (item) {
+					var li = document.createElement("li");
+					var link = document.createElement("a");
+					var title = document.createElement("span");
+					var meta = document.createElement("span");
+					var details = [item.forum, item.size, item.seeders != null ? "S: " + item.seeders : null, item.leechers != null ? "L: " + item.leechers : null].filter(Boolean);
+
+					link.className = "result-link";
+					link.href = item.url || "https://rutracker.org/forum/";
+					link.target = "_blank";
+					link.rel = "noopener";
+					title.className = "result-title";
+					title.textContent = item.title || "Без названия";
+					meta.className = "result-meta";
+					meta.textContent = details.join(" · ");
+
+					link.appendChild(title);
+					if (meta.textContent) link.appendChild(meta);
+					li.appendChild(link);
+					list.appendChild(li);
+				});
+			}
+
+			buttons.forEach(function (button) {
+				button.addEventListener("click", function () {
+					setSource(button.dataset.source);
+				});
+			});
+
+			form.addEventListener("submit", function (event) {
+				event.preventDefault();
+				var query = input.value.trim();
+				if (query.length < 2) return;
+
+				if (selectedSource === "prowlarr") {
+					location.href = prowlarrSearchUrl(query);
+					return;
+				}
+
+				clearResults();
+				showStatus("Ищу на RuTracker...");
+
+				fetch("/api/rutracker/search?q=" + encodeURIComponent(query))
+					.then(function (response) {
+						if (!response.ok) {
+							return response.json().catch(function () { return {}; }).then(function (body) {
+								throw new Error(body.detail || "Ошибка поиска");
+							});
+						}
+						return response.json();
+					})
+					.then(function (body) {
+						renderResults(body.items || []);
+					})
+					.catch(function (error) {
+						clearResults();
+						showStatus(error.message || "Не удалось выполнить поиск.");
+					});
+			});
 		})();
 	</script>
 </body>
