@@ -36,6 +36,9 @@ services:
     volumes:
       - ${SING_BOX_CONFIG_FILE:-./config/sing-box/config.json}:/etc/sing-box/config.json:ro
     command: ["run", "-c", "/etc/sing-box/config.json"]
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     networks: [stack]
     ports:
       - "${DELUGE_PEER_PORT:-6881}:6881/tcp"
