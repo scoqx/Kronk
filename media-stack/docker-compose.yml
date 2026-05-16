@@ -29,6 +29,7 @@ services:
     volumes:
       - ./config/qbittorrent:/config
       - ./data/media:/downloads
+      - ./data/media:/media
     ports:
       - "${TORRENT_PEER_PORT:-6881}:${TORRENT_PEER_PORT:-6881}/tcp"
       - "${TORRENT_PEER_PORT:-6881}:${TORRENT_PEER_PORT:-6881}/udp"
@@ -62,17 +63,6 @@ services:
       - ./config/prowlarr:/config
     networks: [stack]
 
-  rutracker-api:
-    build: ./rutracker-api
-    restart: unless-stopped
-    environment:
-      - RUTRACKER_LOGIN=${RUTRACKER_LOGIN:-}
-      - RUTRACKER_PASSWORD=${RUTRACKER_PASSWORD:-}
-      - RUTRACKER_PROXY=${RUTRACKER_PROXY:-}
-      - RUTRACKER_MAX_RESULTS=${RUTRACKER_MAX_RESULTS:-25}
-      - PY_RUTRACKER_LOG_LEVEL=${PY_RUTRACKER_LOG_LEVEL:-WARNING}
-    networks: [stack]
-
   gateway:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -87,7 +77,6 @@ services:
       - qbittorrent
       - flood
       - prowlarr
-      - rutracker-api
     networks: [stack]
 
 networks:

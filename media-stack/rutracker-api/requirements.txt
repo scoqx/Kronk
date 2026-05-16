@@ -1,3 +1,0 @@
-fastapi
-py-rutracker-client
-uvicorn[standard]

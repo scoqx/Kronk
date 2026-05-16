@@ -33,11 +33,6 @@ handle /flood/* {
 	}
 }
 
-handle /api/rutracker/* {
-	uri strip_prefix /api/rutracker
-	reverse_proxy rutracker-api:8000
-}
-
 handle {
 	root * /srv
 	file_server
