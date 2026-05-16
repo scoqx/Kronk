@@ -2,20 +2,20 @@
 # Портал: только статика; Prowlarr / Jellyfin — корень бэкенда; Transmission — префикс /transmission/ как у образа linuxserver.
 
 {$PUBLIC_HOSTNAME} {
-	import snippets/common.caddy
+	import common.caddy
 	root * /srv
 	file_server
 }
 
 {$PROWLARR_HOSTNAME} {
-	import snippets/common.caddy
+	import common.caddy
 	reverse_proxy prowlarr:9696 {
 		header_up Host {http.request.host}
 	}
 }
 
 {$TRANSMISSION_HOSTNAME} {
-	import snippets/common.caddy
+	import common.caddy
 	handle /transmission/* {
 		reverse_proxy transmission:9091 {
 			header_up Host {http.request.host}
@@ -27,7 +27,7 @@
 }
 
 {$JELLYFIN_HOSTNAME} {
-	import snippets/common.caddy
+	import common.caddy
 	reverse_proxy jellyfin:8096 {
 		header_up Host {http.request.host}
 		flush_interval -1

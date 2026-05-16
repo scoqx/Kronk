@@ -1,4 +1,4 @@
-import snippets/common.caddy
+import common.caddy
 
 handle /jellyfin {
 	redir /jellyfin/ 308
