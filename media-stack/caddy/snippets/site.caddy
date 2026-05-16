@@ -5,6 +5,10 @@ handle /jellyfin {
 }
 handle /jellyfin/* {
 	reverse_proxy jellyfin:8096 {
+		header_up Host {http.request.host}
+		header_up X-Forwarded-Host {http.request.host}
+		header_up X-Forwarded-Proto {http.request.scheme}
+		header_up X-Forwarded-For {http.request.remote.host}
 		flush_interval -1
 		transport http {
 			read_timeout 0
@@ -16,14 +20,24 @@ handle /prowlarr {
 	redir /prowlarr/ 308
 }
 handle /prowlarr/* {
-	reverse_proxy prowlarr:9696
+	reverse_proxy prowlarr:9696 {
+		header_up Host {http.request.host}
+		header_up X-Forwarded-Host {http.request.host}
+		header_up X-Forwarded-Proto {http.request.scheme}
+		header_up X-Forwarded-For {http.request.remote.host}
+	}
 }
 
 handle /transmission {
 	redir /transmission/ 308
 }
 handle /transmission/* {
-	reverse_proxy transmission:9091
+	reverse_proxy transmission:9091 {
+		header_up Host {http.request.host}
+		header_up X-Forwarded-Host {http.request.host}
+		header_up X-Forwarded-Proto {http.request.scheme}
+		header_up X-Forwarded-For {http.request.remote.host}
+	}
 }
 
 handle {
