@@ -45,6 +45,12 @@ services:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
+      # Исходящие запросы к индексерам: часть сайтов даёт HTTP/2 PROTOCOL_ERROR в .NET — принудительно HTTP/1.x.
+      - DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2SUPPORT=false
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 1.1.1.1
     volumes:
       - ./config/prowlarr:/config
     networks: [stack]

@@ -3,171 +3,171 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Медиа · домашний стек</title>
+	<meta name="color-scheme" content="dark light" />
+	<title>super.scox.space</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet" />
 	<style>
 		:root {
-			color-scheme: dark light;
-			--bg: #0f1217;
-			--card: #171b22;
-			--text: #e8ecf1;
-			--muted: #9aa3ad;
-			--accent: #6ea8fe;
-			--border: #2a3140;
+			--bg0: #07080c;
+			--bg1: #10141f;
+			--glass: rgba(18, 22, 32, 0.72);
+			--stroke: rgba(255, 255, 255, 0.09);
+			--text: #eef1f6;
+			--dim: rgba(238, 241, 246, 0.55);
+			--accent: #7eb8ff;
+			--accent2: #a78bfa;
+			--shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
 		}
 		@media (prefers-color-scheme: light) {
 			:root {
-				--bg: #f6f7fb;
-				--card: #ffffff;
+				--bg0: #f0f2f8;
+				--bg1: #e2e6f0;
+				--glass: rgba(255, 255, 255, 0.78);
+				--stroke: rgba(15, 20, 35, 0.1);
 				--text: #121520;
-				--muted: #5c6570;
-				--accent: #255dcf;
-				--border: #e3e7ee;
+				--dim: rgba(18, 21, 32, 0.5);
+				--accent: #2563eb;
+				--accent2: #6d28d9;
+				--shadow: 0 20px 40px rgba(35, 45, 80, 0.12);
 			}
 		}
 		* { box-sizing: border-box; }
 		body {
 			margin: 0;
 			min-height: 100vh;
-			font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
-			background: radial-gradient(1200px 600px at 10% -10%, #24304755, transparent),
-				radial-gradient(900px 500px at 110% 10%, #2c225055, transparent),
-				var(--bg);
+			font-family: "Outfit", system-ui, sans-serif;
 			color: var(--text);
+			background:
+				radial-gradient(ellipse 80% 60% at 20% 0%, rgba(126, 184, 255, 0.18), transparent 55%),
+				radial-gradient(ellipse 70% 50% at 90% 20%, rgba(167, 139, 250, 0.14), transparent 50%),
+				linear-gradient(165deg, var(--bg0), var(--bg1));
 			display: grid;
 			place-items: center;
-			padding: 24px;
+			padding: clamp(20px, 4vw, 40px);
 		}
-		main {
-			width: min(520px, 100%);
-			background: var(--card);
-			border: 1px solid var(--border);
-			border-radius: 16px;
-			padding: 22px 22px 18px;
-			box-shadow: 0 12px 40px #00000022;
+		.panel {
+			width: min(420px, 100%);
+			padding: clamp(28px, 5vw, 40px);
+			border-radius: 24px;
+			background: var(--glass);
+			backdrop-filter: blur(20px);
+			-webkit-backdrop-filter: blur(20px);
+			border: 1px solid var(--stroke);
+			box-shadow: var(--shadow);
 		}
-		h1 {
-			font-size: 1.25rem;
-			margin: 0 0 6px;
-			font-weight: 650;
-			letter-spacing: -0.02em;
+		.brand {
+			margin: 0 0 28px;
+			font-size: clamp(1.35rem, 4vw, 1.6rem);
+			font-weight: 600;
+			letter-spacing: -0.03em;
+			line-height: 1.2;
+			background: linear-gradient(120deg, var(--text), var(--dim));
+			-webkit-background-clip: text;
+			background-clip: text;
+			color: transparent;
 		}
-		p.lead {
-			margin: 0 0 18px;
-			color: var(--muted);
-			line-height: 1.45;
-			font-size: 0.95rem;
+		@media (prefers-color-scheme: light) {
+			.brand {
+				background: linear-gradient(120deg, #121520, #455068);
+				-webkit-background-clip: text;
+				background-clip: text;
+				color: transparent;
+			}
 		}
-		.grid {
+		.tiles {
 			display: grid;
-			gap: 10px;
+			gap: 12px;
 		}
-		a.tile {
+		.tile {
 			display: flex;
 			align-items: center;
-			justify-content: space-between;
-			gap: 12px;
-			padding: 14px 14px;
-			border-radius: 12px;
-			border: 1px solid var(--border);
+			gap: 16px;
+			padding: 18px 20px;
+			border-radius: 16px;
 			text-decoration: none;
 			color: inherit;
-			background: linear-gradient(180deg, #ffffff0a, #ffffff00);
+			border: 1px solid var(--stroke);
+			background: rgba(255, 255, 255, 0.03);
+			transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 		}
-		a.tile:hover { border-color: color-mix(in oklab, var(--accent) 55%, var(--border)); }
-		a.tile:focus-visible {
-			outline: 2px solid color-mix(in oklab, var(--accent) 70%, white);
-			outline-offset: 2px;
+		@media (prefers-color-scheme: light) {
+			.tile { background: rgba(255, 255, 255, 0.5); }
 		}
-		.tile-title { font-weight: 650; }
-		.tile-sub { font-size: 0.85rem; color: var(--muted); margin-top: 3px; }
-		.chev { color: var(--muted); font-size: 1.1rem; }
-		footer {
-			margin-top: 14px;
-			padding-top: 12px;
-			border-top: 1px solid var(--border);
-			font-size: 0.82rem;
-			color: var(--muted);
-			line-height: 1.45;
+		.tile:hover {
+			transform: translateY(-2px);
+			border-color: color-mix(in oklab, var(--accent) 45%, var(--stroke));
+			box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
 		}
-		code {
-			font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-			font-size: 0.82em;
-			padding: 1px 6px;
-			border-radius: 6px;
-			border: 1px solid var(--border);
-			background: #ffffff0a;
+		.tile:focus-visible {
+			outline: 2px solid var(--accent);
+			outline-offset: 3px;
+		}
+		.tile-icon {
+			width: 44px;
+			height: 44px;
+			border-radius: 12px;
+			display: grid;
+			place-items: center;
+			font-size: 1.25rem;
+			line-height: 1;
+			flex-shrink: 0;
+			background: linear-gradient(145deg, color-mix(in oklab, var(--accent) 35%, transparent), color-mix(in oklab, var(--accent2) 25%, transparent));
+			border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+		}
+		.tile-label {
+			font-size: 1.05rem;
+			font-weight: 600;
+			letter-spacing: -0.02em;
+		}
+		.tile-arrow {
+			margin-left: auto;
+			opacity: 0.45;
+			font-size: 1.1rem;
 		}
 	</style>
 </head>
 <body>
-	<main>
-		<h1>Домашний медиа-стек</h1>
-		<p class="lead" id="lead-text">Локально: сервисы по путям ниже. На проде с поддоменами: с этой страницы (портал) ссылки ведут на отдельные имена — см. подписи у кнопок.</p>
-
-		<div class="grid">
+	<div class="panel">
+		<h1 class="brand" id="brand">super.scox.space</h1>
+		<nav class="tiles" aria-label="Сервисы">
 			<a class="tile" id="link-prowlarr" href="/prowlarr/" rel="noopener">
-				<div>
-					<div class="tile-title">Поиск по трекерам</div>
-					<div class="tile-sub" data-sub-desc hidden>Prowlarr (поддомен)</div>
-					<div class="tile-sub path-desc">Prowlarr · индексаторы и отправка в клиент</div>
-				</div>
-				<div class="chev">→</div>
+				<span class="tile-icon" aria-hidden="true">⌕</span>
+				<span class="tile-label">Поиск</span>
+				<span class="tile-arrow" aria-hidden="true">→</span>
 			</a>
 			<a class="tile" id="link-transmission" href="/transmission/web/" rel="noopener">
-				<div>
-					<div class="tile-title">Торренты</div>
-					<div class="tile-sub" data-sub-desc hidden>Transmission (поддомен)</div>
-					<div class="tile-sub path-desc">Transmission / Transmissionic · загрузки и магнеты</div>
-				</div>
-				<div class="chev">→</div>
+				<span class="tile-icon" aria-hidden="true">⇩</span>
+				<span class="tile-label">Торренты</span>
+				<span class="tile-arrow" aria-hidden="true">→</span>
 			</a>
 			<a class="tile" id="link-jellyfin" href="/jellyfin/" rel="noopener">
-				<div>
-					<div class="tile-title">Медиасервер</div>
-					<div class="tile-sub" data-sub-desc hidden>Jellyfin (поддомен)</div>
-					<div class="tile-sub path-desc">Jellyfin · библиотека из папки загрузок</div>
-				</div>
-				<div class="chev">→</div>
+				<span class="tile-icon" aria-hidden="true">▶</span>
+				<span class="tile-label">Просмотр</span>
+				<span class="tile-arrow" aria-hidden="true">→</span>
 			</a>
-		</div>
-
-		<footer id="footer-hint">
-			<div>Локально: откройте <code id="origin-hint"></code> и используйте <code>/prowlarr/</code>, <code>/transmission/</code>, <code>/jellyfin/</code>.</div>
-			<div style="margin-top:8px;">Прод (поддомены): задайте на <code>&lt;html data-portal-domain="…"&gt;</code> тот же FQDN, что <code>PUBLIC_HOSTNAME</code> в <code>.env</code> (сейчас по умолчанию <code>super.scox.space</code>). Префиксы поддоменов задаются в Caddy и <code>.env</code> (<code>lft</code> / <code>mmd</code> / <code>wwv</code>).</div>
-			<div style="margin-top:8px;">Jellyfin / Prowlarr за обратным прокси: локально — Base URL / URL Base с префиксом; на поддоменах — поля пустые.</div>
-			<div style="margin-top:8px;">Prowlarr → Transmission из Docker: хост <code>transmission</code>, порт <code>9091</code>, логин/пароль из <code>.env</code>.</div>
-			<div style="margin-top:8px;">Transmission: перечислите все веб-имена в <code>TRANSMISSION_HOST_WHITELIST</code>.</div>
-		</footer>
-	</main>
+		</nav>
+	</div>
 	<script>
 		(function () {
-			var originEl = document.getElementById("origin-hint");
-			if (originEl) originEl.textContent = location.origin || "";
-
 			var portal = document.documentElement.getAttribute("data-portal-domain");
-			// Если открыт портал (тот же hostname, что PUBLIC_HOSTNAME в .env) — ссылки на поддомены lft/mmd/wwv.
+			var brand = document.getElementById("brand");
+			if (brand && portal && location.hostname !== portal) {
+				brand.textContent = location.host || "Медиа";
+				document.title = brand.textContent;
+			}
 			if (portal && location.hostname === portal && portal.indexOf(".") !== -1) {
-				var zone = portal;
-				var map = {
-					"link-prowlarr": "https://lft." + zone + "/",
-					"link-transmission": "https://mmd." + zone + "/transmission/web/",
-					"link-jellyfin": "https://wwv." + zone + "/"
+				var z = portal;
+				var m = {
+					"link-prowlarr": "https://lft." + z + "/",
+					"link-transmission": "https://mmd." + z + "/transmission/web/",
+					"link-jellyfin": "https://wwv." + z + "/"
 				};
-				Object.keys(map).forEach(function (id) {
-					var a = document.getElementById(id);
-					if (a) a.setAttribute("href", map[id]);
+				Object.keys(m).forEach(function (id) {
+					var el = document.getElementById(id);
+					if (el) el.setAttribute("href", m[id]);
 				});
-				document.querySelectorAll("[data-sub-desc]").forEach(function (el) {
-					el.hidden = false;
-				});
-				document.querySelectorAll(".path-desc").forEach(function (el) {
-					el.hidden = true;
-				});
-				var lead = document.getElementById("lead-text");
-				if (lead) {
-					lead.textContent =
-						"Портал на этом домене; поиск, клиент и просмотр — на поддоменах lft / mmd / wwv (см. ссылки).";
-				}
 			}
 		})();
 	</script>
