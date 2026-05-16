@@ -1,5 +1,7 @@
 {
-  "log": { "level": "info" },
+  "log": {
+    "level": "info"
+  },
   "dns": {
     "servers": [
       {
@@ -14,14 +16,18 @@
     {
       "type": "tun",
       "tag": "tun-in",
-      "address": ["198.18.0.1/15"],
+      "address": [
+        "198.18.0.1/15"
+      ],
       "auto_route": true,
-      "strict_route": true,
       "stack": "system"
     }
   ],
   "outbounds": [
-    { "type": "direct", "tag": "direct" }
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
   ],
   "route": {
     "auto_detect_interface": true,

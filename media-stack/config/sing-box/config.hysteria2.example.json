@@ -1,5 +1,7 @@
 {
-  "log": { "level": "info" },
+  "log": {
+    "level": "info"
+  },
   "dns": {
     "servers": [
       {
@@ -14,9 +16,10 @@
     {
       "type": "tun",
       "tag": "tun-in",
-      "address": ["198.18.0.1/15"],
+      "address": [
+        "198.18.0.1/15"
+      ],
       "auto_route": true,
-      "strict_route": true,
       "stack": "system"
     }
   ],
@@ -41,10 +44,19 @@
         "password": "YOUR_OBFS_PASSWORD"
       }
     },
-    { "type": "direct", "tag": "direct" }
+    {
+      "type": "direct",
+      "tag": "direct"
+    }
   ],
   "route": {
     "auto_detect_interface": true,
+    "rules": [
+      {
+        "port": 53,
+        "outbound": "direct"
+      }
+    ],
     "final": "hy2-out"
   }
 }
