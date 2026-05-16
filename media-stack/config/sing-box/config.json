@@ -17,8 +17,7 @@
       "address": ["198.18.0.1/15"],
       "auto_route": true,
       "strict_route": true,
-      "stack": "system",
-      "sniff": true
+      "stack": "system"
     }
   ],
   "outbounds": [

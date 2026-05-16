@@ -65,6 +65,13 @@ fi
 PEER="$(grep -E '^DELUGE_PEER_PORT=' .env | cut -d= -f2- | tr -d '\r' || true)"
 PEER="${PEER:-6881}"
 
+SING_BOX_CONFIG_FILE="$(grep -E '^SING_BOX_CONFIG_FILE=' .env | cut -d= -f2- | tr -d '\r' || true)"
+if [[ -n "${SING_BOX_CONFIG_FILE// /}" && ! -f "$SING_BOX_CONFIG_FILE" ]]; then
+	echo "SING_BOX_CONFIG_FILE задан, но файл не найден: ${SING_BOX_CONFIG_FILE}" >&2
+	echo "Создайте внешний sing-box config.json на сервере или уберите переменную для direct-конфига из repo." >&2
+	exit 1
+fi
+
 PH="$(grep -E '^PUBLIC_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 LFT="$(grep -E '^PROWLARR_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 MMD="$(grep -E '^DELUGE_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
