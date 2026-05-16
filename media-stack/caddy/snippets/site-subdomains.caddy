@@ -1,5 +1,5 @@
 # Прод: отдельные поддомены (TLS на каждом). Переменные — в env контейнера gateway (см. docker-compose.server.yml).
-# Портал: статика; Prowlarr / Jellyfin / Deluge Web — корень бэкенда (:9696 / :8096 / :8112).
+# Портал: статика; Prowlarr / Jellyfin / AriaNg — корень бэкенда (:9696 / :8096 / :6880).
 
 {$PUBLIC_HOSTNAME} {
 	import common.caddy
@@ -18,7 +18,18 @@
 
 {$DELUGE_HOSTNAME} {
 	import common.caddy
-	reverse_proxy deluge-net:8112 {
+	handle /jsonrpc {
+		reverse_proxy aria2:6800 {
+			header_up Host {http.request.host}
+		}
+	}
+	handle /json {
+		rewrite * /jsonrpc
+		reverse_proxy aria2:6800 {
+			header_up Host {http.request.host}
+		}
+	}
+	reverse_proxy aria2-ui:6880 {
 		header_up Host {http.request.host}
 	}
 }

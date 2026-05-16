@@ -62,13 +62,12 @@ if ! docker info >/dev/null 2>&1; then
 	exit 1
 fi
 
-PEER="$(grep -E '^DELUGE_PEER_PORT=' .env | cut -d= -f2- | tr -d '\r' || true)"
+PEER="$(grep -E '^ARIA2_PEER_PORT=' .env | cut -d= -f2- | tr -d '\r' || true)"
 PEER="${PEER:-6881}"
 
-SING_BOX_CONFIG_FILE="$(grep -E '^SING_BOX_CONFIG_FILE=' .env | cut -d= -f2- | tr -d '\r' || true)"
-if [[ -n "${SING_BOX_CONFIG_FILE// /}" && ! -f "$SING_BOX_CONFIG_FILE" ]]; then
-	echo "SING_BOX_CONFIG_FILE задан, но файл не найден: ${SING_BOX_CONFIG_FILE}" >&2
-	echo "Создайте внешний sing-box config.json на сервере или уберите переменную для direct-конфига из repo." >&2
+ARIA2_RPC_SECRET="$(grep -E '^ARIA2_RPC_SECRET=' .env | cut -d= -f2- | tr -d '\r' || true)"
+if [[ -z "${ARIA2_RPC_SECRET// /}" || "$ARIA2_RPC_SECRET" == "change-me" ]]; then
+	echo "В .env задайте ARIA2_RPC_SECRET (не change-me)." >&2
 	exit 1
 fi
 
@@ -85,9 +84,10 @@ echo "Готово. Проверьте DNS (A/AAAA на IP этого серве
 echo "  ${PH}, ${LFT}, ${MMD}, ${WV}"
 echo ""
 echo "Портал: https://${PH}/"
-echo "Prowlarr: https://${LFT}/  |  Deluge Web: https://${MMD}/  |  Jellyfin: https://${WV}/"
+echo "Prowlarr: https://${LFT}/  |  AriaNg: https://${MMD}/  |  Jellyfin: https://${WV}/"
 echo ""
-echo "Deluge Web UI: первый вход обычно admin / deluge (смените в UI). Prowlarr → Deluge: хост deluge-net, порт 58846."
+echo "AriaNg → Aria2 RPC: https://${MMD}/jsonrpc, secret из ARIA2_RPC_SECRET."
+echo "Prowlarr → Aria2: хост aria2, порт 6800, secret из ARIA2_RPC_SECRET."
 echo "В Jellyfin/Prowlarr при поддоменах Base URL и URL Base оставьте пустыми."
 echo "Фаервол (если есть): TCP 80, 443 и TCP+UDP ${PEER} для торрентов."
 echo ""

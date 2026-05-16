@@ -1,18 +1,12 @@
-# Один внешний вход (gateway): локально — главная и сервисы по префиксам /jellyfin /prowlarr /deluge (caddy/snippets/site.caddy).
+# Один внешний вход (gateway): локально — главная и сервисы по префиксам /jellyfin /prowlarr /aria2 (caddy/snippets/site.caddy).
 # На сервере: CADDY_PRIMARY_FILE=Caddyfile.server + docker-compose.server.yml — отдельный FQDN на портал и на каждый сервис (см. caddy/snippets/site-subdomains.caddy).
 #
-# Загрузки: ./data/media → Deluge /downloads и Jellyfin /media (библиотека в /media/complete).
-#
-# Исходящий трафик Deluge (торренты): контейнер deluge использует сетевой стек sidecar deluge-net (sing-box + TUN).
-# Конфиг sing-box по умолчанию безопасный из репозитория. На сервере реальный Hysteria2-конфиг храните вне repo
-# и укажите путь в .env: SING_BOX_CONFIG_FILE=/opt/kronk-secrets/sing-box/config.json
-# Sidecar нужен Linux и /dev/net/tun (типичный VPS). Локально на Docker Desktop без TUN может не стартовать — временно закомментируйте deluge-net и верните deluge в networks: [stack] и порты, как в истории git.
+# Загрузки: ./data/media → Aria2 /downloads и Jellyfin /media (библиотека в /media/complete).
 #
 # После первого запуска:
-# - Локально: Jellyfin Base URL /jellyfin; Prowlarr URL Base /prowlarr. Deluge Web — по /deluge/
-# - Прод с поддоменами: Base URL / URL Base у Jellyfin/Prowlarr пустые; веб Deluge на поддомене (см. .env.server.example).
-# - Prowlarr → Deluge (внутри Docker): хост deluge-net, порт 58846 (daemon), пароль daemon — в Deluge Preferences → Daemon (после входа в Web UI).
-# - Deluge Web UI (linuxserver): первый вход по умолчанию admin / deluge — смените: Preferences → Interface → Password.
+# - Локально: Jellyfin Base URL /jellyfin; Prowlarr URL Base /prowlarr. AriaNg UI — по /aria2/
+# - Прод с поддоменами: Base URL / URL Base у Jellyfin/Prowlarr пустые; AriaNg UI на поддомене (см. .env.server.example).
+# - Prowlarr → Aria2 (внутри Docker): хост aria2, порт 6800, secret из ARIA2_RPC_SECRET.
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
@@ -22,43 +16,31 @@ services:
       - ./data/media:/media
     networks: [stack]
 
-  deluge-net:
-    image: ghcr.io/sagernet/sing-box:latest
+  aria2:
+    image: p3terx/aria2-pro:latest
     restart: unless-stopped
-    environment:
-      - ENABLE_DEPRECATED_LEGACY_DNS_SERVERS=true
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-    volumes:
-      - ${SING_BOX_CONFIG_FILE:-./config/sing-box/config.json}:/etc/sing-box/config.json:ro
-    command: ["run", "-c", "/etc/sing-box/config.json"]
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
-    networks: [stack]
-    ports:
-      - "${DELUGE_PEER_PORT:-6881}:6881/tcp"
-      - "${DELUGE_PEER_PORT:-6881}:6881/udp"
-
-  deluge:
-    # Первый вход в веб: admin / deluge (см. https://docs.linuxserver.io/images/docker-deluge/ ). Пароль сменить в UI.
-    image: lscr.io/linuxserver/deluge:latest
-    restart: unless-stopped
-    network_mode: "service:deluge-net"
-    depends_on:
-      - deluge-net
     environment:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
-      - DELUGE_LOGLEVEL=${DELUGE_LOGLEVEL:-info}
+      - UMASK_SET=${UMASK_SET:-022}
+      - RPC_SECRET=${ARIA2_RPC_SECRET:?Set ARIA2_RPC_SECRET in .env}
+      - RPC_PORT=6800
+      - LISTEN_PORT=${ARIA2_PEER_PORT:-6881}
     volumes:
-      - ./config/deluge:/config
+      - ./config/aria2:/config
       - ./data/media:/downloads
+    ports:
+      - "${ARIA2_PEER_PORT:-6881}:${ARIA2_PEER_PORT:-6881}/tcp"
+      - "${ARIA2_PEER_PORT:-6881}:${ARIA2_PEER_PORT:-6881}/udp"
+    networks: [stack]
+
+  aria2-ui:
+    image: p3terx/ariang:latest
+    restart: unless-stopped
+    depends_on:
+      - aria2
+    networks: [stack]
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
@@ -88,8 +70,8 @@ services:
       - ./www:/srv:ro
     depends_on:
       - jellyfin
-      - deluge-net
-      - deluge
+      - aria2
+      - aria2-ui
       - prowlarr
     networks: [stack]
 

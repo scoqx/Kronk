@@ -1,5 +1,5 @@
 # Прод: портал + сервисы на своих FQDN; автоматический HTTPS (Let's Encrypt).
 # В .env: PUBLIC_HOSTNAME, PROWLARR_HOSTNAME, DELUGE_HOSTNAME, JELLYFIN_HOSTNAME и DNS A/AAAA.
-# Локально — Caddyfile + site.caddy (пути /prowlarr, /deluge, /jellyfin).
+# Локально — Caddyfile + site.caddy (пути /prowlarr, /aria2, /jellyfin).
 
 import snippets/site-subdomains.caddy
