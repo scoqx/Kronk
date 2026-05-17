@@ -6,4 +6,9 @@ config/aria2/
 config/flood/
 config/qbittorrent/
 config/prowlarr/
+caddy/config/
+caddy/data/
+caddy/letsencrypt/
+caddy/letsencrypt-logs/
+caddy/letsencrypt-work/
 caddy/passwords.txt

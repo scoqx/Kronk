@@ -86,6 +86,9 @@ services:
       - ./${CADDY_PRIMARY_FILE:-Caddyfile}:/etc/caddy/Caddyfile:ro
       - ./caddy/snippets:/etc/caddy/snippets:ro
       - ./www:/srv:ro
+      - ./caddy/letsencrypt:/etc/letsencrypt:ro
+      - ./caddy/data:/data
+      - ./caddy/config:/config
     depends_on:
       - jellyfin
       - qbittorrent

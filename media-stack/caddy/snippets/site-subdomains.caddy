@@ -3,6 +3,7 @@
 
 {$PUBLIC_HOSTNAME} {
 	import common.caddy
+	tls /etc/letsencrypt/live/super.scox.space/fullchain.pem /etc/letsencrypt/live/super.scox.space/privkey.pem
 	# Чтобы браузер не показывал старый index.html после деплоя
 	header Cache-Control "no-cache, must-revalidate"
 	root * /srv
@@ -11,6 +12,7 @@
 
 {$METUBE_HOSTNAME} {
 	import common.caddy
+	tls /etc/letsencrypt/live/super.scox.space/fullchain.pem /etc/letsencrypt/live/super.scox.space/privkey.pem
 	basicauth {
 		{$METUBE_AUTH_USERNAME} {$METUBE_AUTH_PASSWORD_HASH}
 	}
@@ -21,6 +23,7 @@
 
 {$PROWLARR_HOSTNAME} {
 	import common.caddy
+	tls /etc/letsencrypt/live/super.scox.space/fullchain.pem /etc/letsencrypt/live/super.scox.space/privkey.pem
 	reverse_proxy prowlarr:9696 {
 		header_up Host {http.request.host}
 	}
@@ -28,6 +31,7 @@
 
 {$DELUGE_HOSTNAME} {
 	import common.caddy
+	tls /etc/letsencrypt/live/super.scox.space/fullchain.pem /etc/letsencrypt/live/super.scox.space/privkey.pem
 	reverse_proxy flood:3000 {
 		header_up Host {http.request.host}
 	}
@@ -35,6 +39,7 @@
 
 {$JELLYFIN_HOSTNAME} {
 	import common.caddy
+	tls /etc/letsencrypt/live/super.scox.space/fullchain.pem /etc/letsencrypt/live/super.scox.space/privkey.pem
 	reverse_proxy jellyfin:8096 {
 		header_up Host {http.request.host}
 		flush_interval -1
