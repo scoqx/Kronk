@@ -1,4 +1,4 @@
-# Один внешний вход (gateway): локально — главная и сервисы по префиксам /jellyfin /prowlarr /flood (caddy/snippets/site.caddy).
+# Один внешний вход (gateway): локально — главная и сервисы по префиксам /metube /jellyfin /prowlarr /flood (caddy/snippets/site.caddy).
 # На сервере: CADDY_PRIMARY_FILE=Caddyfile.server + docker-compose.server.yml — отдельный FQDN на портал и на каждый сервис (см. caddy/snippets/site-subdomains.caddy).
 #
 # Загрузки: ./data/media → qBittorrent /downloads и Jellyfin /media (библиотека в /media/complete).
@@ -46,6 +46,17 @@ services:
       - qbittorrent
     networks: [stack]
 
+  metube:
+    image: ghcr.io/alexta69/metube:latest
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-UTC}
+    volumes:
+      - ./data/media:/downloads
+    networks: [stack]
+
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     restart: unless-stopped
@@ -76,6 +87,7 @@ services:
       - jellyfin
       - qbittorrent
       - flood
+      - metube
       - prowlarr
     networks: [stack]
 

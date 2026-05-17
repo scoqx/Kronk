@@ -47,6 +47,7 @@ grep -q '^EDGE_HTTP_PORT=' .env 2>/dev/null && PORT="$(grep -E '^EDGE_HTTP_PORT=
 echo ""
 echo "Поднято. Откройте в браузере:"
 echo "  http://${HOST}:${PORT}/           — портал"
+echo "  http://${HOST}:${PORT}/metube/"
 echo "  http://${HOST}:${PORT}/prowlarr/"
 echo "  http://${HOST}:${PORT}/flood/"
 echo "  http://${HOST}:${PORT}/jellyfin/"

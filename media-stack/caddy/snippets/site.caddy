@@ -1,5 +1,15 @@
 import common.caddy
 
+handle /metube {
+	redir /metube/ 308
+}
+handle /metube/* {
+	uri strip_prefix /metube
+	reverse_proxy metube:8081 {
+		header_up Host {http.request.host}
+	}
+}
+
 handle /jellyfin {
 	redir /jellyfin/ 308
 }

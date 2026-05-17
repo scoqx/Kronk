@@ -161,6 +161,11 @@
 	<div class="panel">
 		<h1 class="brand" id="brand">super.scox.space</h1>
 		<nav class="tiles" aria-label="Сервисы">
+			<a class="tile" id="link-metube" href="/metube/" rel="noopener">
+				<span class="tile-icon" aria-hidden="true">↓</span>
+				<span class="tile-label">MeTube</span>
+				<span class="tile-arrow" aria-hidden="true">→</span>
+			</a>
 			<a class="tile" id="link-prowlarr" href="/prowlarr/" rel="noopener">
 				<span class="tile-icon" aria-hidden="true">⌕</span>
 				<span class="tile-label" data-label="search">Поиск</span>
@@ -325,6 +330,7 @@
 			if (portal && location.hostname === portal && portal.indexOf(".") !== -1) {
 				var z = portal;
 				var m = {
+					"link-metube": "https://mtt." + z + "/",
 					"link-prowlarr": "https://lft." + z + "/",
 					"link-deluge": "https://mmd." + z + "/",
 					"link-jellyfin": "https://wwv." + z + "/"

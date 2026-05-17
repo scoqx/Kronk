@@ -1,5 +1,5 @@
 # Прод: отдельные поддомены (TLS на каждом). Переменные — в env контейнера gateway (см. docker-compose.server.yml).
-# Портал: статика; Prowlarr / Jellyfin / Flood — корень бэкенда (:9696 / :8096 / :3000).
+# Портал: статика; MeTube / Prowlarr / Jellyfin / Flood — корень бэкенда (:8081 / :9696 / :8096 / :3000).
 
 {$PUBLIC_HOSTNAME} {
 	import common.caddy
@@ -7,6 +7,13 @@
 	header Cache-Control "no-cache, must-revalidate"
 	root * /srv
 	file_server
+}
+
+{$METUBE_HOSTNAME} {
+	import common.caddy
+	reverse_proxy metube:8081 {
+		header_up Host {http.request.host}
+	}
 }
 
 {$PROWLARR_HOSTNAME} {

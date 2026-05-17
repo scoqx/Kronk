@@ -17,7 +17,7 @@ done
 if [[ ! -f .env ]]; then
 	echo "Нет .env — скопируйте шаблон:" >&2
 	echo "  cp .env.server.example .env" >&2
-	echo "Заполните PUBLIC_HOSTNAME, PROWLARR_HOSTNAME, DELUGE_HOSTNAME, JELLYFIN_HOSTNAME." >&2
+	echo "Заполните PUBLIC_HOSTNAME, METUBE_HOSTNAME, PROWLARR_HOSTNAME, DELUGE_HOSTNAME, JELLYFIN_HOSTNAME." >&2
 	exit 1
 fi
 
@@ -33,6 +33,7 @@ require_env_var() {
 }
 
 require_env_var PUBLIC_HOSTNAME
+require_env_var METUBE_HOSTNAME
 require_env_var PROWLARR_HOSTNAME
 require_env_var DELUGE_HOSTNAME
 require_env_var JELLYFIN_HOSTNAME
@@ -66,6 +67,7 @@ PEER="$(grep -E '^TORRENT_PEER_PORT=' .env | cut -d= -f2- | tr -d '\r' || true)"
 PEER="${PEER:-6881}"
 
 PH="$(grep -E '^PUBLIC_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
+MTT="$(grep -E '^METUBE_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 LFT="$(grep -E '^PROWLARR_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 MMD="$(grep -E '^DELUGE_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 WV="$(grep -E '^JELLYFIN_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
@@ -75,10 +77,10 @@ WV="$(grep -E '^JELLYFIN_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 
 echo ""
 echo "Готово. Проверьте DNS (A/AAAA на IP этого сервера):"
-echo "  ${PH}, ${LFT}, ${MMD}, ${WV}"
+echo "  ${PH}, ${MTT}, ${LFT}, ${MMD}, ${WV}"
 echo ""
 echo "Портал: https://${PH}/"
-echo "Prowlarr: https://${LFT}/  |  Flood: https://${MMD}/  |  Jellyfin: https://${WV}/"
+echo "MeTube: https://${MTT}/  |  Prowlarr: https://${LFT}/  |  Flood: https://${MMD}/  |  Jellyfin: https://${WV}/"
 echo ""
 echo "Flood/Prowlarr → qBittorrent: хост qbittorrent, порт 8080, username admin, пароль Web UI из логов qbittorrent."
 echo "В Jellyfin/Prowlarr при поддоменах Base URL и URL Base оставьте пустыми."
