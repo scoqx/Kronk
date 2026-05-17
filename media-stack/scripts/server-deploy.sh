@@ -34,6 +34,8 @@ require_env_var() {
 
 require_env_var PUBLIC_HOSTNAME
 require_env_var METUBE_HOSTNAME
+require_env_var METUBE_AUTH_USERNAME
+require_env_var METUBE_AUTH_PASSWORD_HASH
 require_env_var PROWLARR_HOSTNAME
 require_env_var DELUGE_HOSTNAME
 require_env_var JELLYFIN_HOSTNAME

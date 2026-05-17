@@ -11,6 +11,9 @@
 
 {$METUBE_HOSTNAME} {
 	import common.caddy
+	basicauth {
+		{$METUBE_AUTH_USERNAME} {$METUBE_AUTH_PASSWORD_HASH}
+	}
 	reverse_proxy metube:8081 {
 		header_up Host {http.request.host}
 	}

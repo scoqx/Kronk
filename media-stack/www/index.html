@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru" data-portal-domain="super.scox.space">
+<html lang="ru">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="color-scheme" content="dark light" />
-	<title>super.scox.space</title>
+	<title>Медиа</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com" />
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet" />
@@ -12,37 +12,64 @@
 		:root {
 			--bg0: #07080c;
 			--bg1: #10141f;
-			--glass: rgba(18, 22, 32, 0.72);
-			--stroke: rgba(255, 255, 255, 0.09);
+			--blob1: #7eb8ff;
+			--blob2: #a78bfa;
+			--blob3: #22d3ee;
+			--blob-opacity: 0.45;
+			--mesh-angle: 155deg;
+			--glass: rgba(18, 22, 32, 0.42);
+			--stroke: rgba(255, 255, 255, 0.16);
+			--highlight: rgba(255, 255, 255, 0.24);
+			--caustic: rgba(255, 255, 255, 0.06);
+			--reflection-start: rgba(255, 255, 255, 0.22);
+			--reflection-end: rgba(255, 255, 255, 0);
+			--glare: rgba(255, 255, 255, 0.18);
 			--text: #eef1f6;
 			--dim: rgba(238, 241, 246, 0.55);
 			--accent: #7eb8ff;
 			--accent2: #a78bfa;
-			--glow1: rgba(126, 184, 255, 0.18);
-			--glow2: rgba(167, 139, 250, 0.14);
-			--shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+			--button-bg: rgba(255, 255, 255, 0.08);
+			--button-hover: rgba(255, 255, 255, 0.18);
+			--button-border: rgba(255, 255, 255, 0.16);
+			--icon-bg: rgba(255, 255, 255, 0.12);
+			--shadow: 0 42px 90px rgba(0, 0, 0, 0.45), 0 12px 30px rgba(0, 0, 0, 0.28);
 			--font: "Outfit", system-ui, sans-serif;
-			--panel-radius: 24px;
-			--tile-radius: 16px;
-			--icon-radius: 12px;
+			--panel-radius: 34px;
+			--tile-radius: 24px;
+			--icon-radius: 18px;
 			--panel-border-width: 1px;
-			--tile-bg: rgba(255, 255, 255, 0.03);
-			--hover-lift: -2px;
+			--hover-lift: -3px;
+			--blob-1-top: -16%;
+			--blob-1-left: -12%;
+			--blob-2-bottom: -18%;
+			--blob-2-right: -10%;
+			--blob-3-top: 28%;
+			--blob-3-left: 45%;
 		}
 		@media (prefers-color-scheme: light) {
 			:root {
 				--bg0: #f0f2f8;
 				--bg1: #e2e6f0;
-				--glass: rgba(255, 255, 255, 0.78);
-				--stroke: rgba(15, 20, 35, 0.1);
+				--blob1: #ff2a5f;
+				--blob2: #007aff;
+				--blob3: #ff9500;
+				--blob-opacity: 0.56;
+				--glass: rgba(255, 255, 255, 0.18);
+				--stroke: rgba(255, 255, 255, 0.42);
+				--highlight: rgba(255, 255, 255, 0.72);
+				--caustic: rgba(255, 255, 255, 0.32);
+				--reflection-start: rgba(255, 255, 255, 0.62);
+				--reflection-end: rgba(255, 255, 255, 0);
+				--glare: rgba(255, 255, 255, 0.48);
 				--text: #121520;
 				--dim: rgba(18, 21, 32, 0.5);
 				--accent: #2563eb;
 				--accent2: #6d28d9;
-				--glow1: rgba(37, 99, 235, 0.14);
-				--glow2: rgba(109, 40, 217, 0.12);
-				--shadow: 0 20px 40px rgba(35, 45, 80, 0.12);
-				--tile-bg: rgba(255, 255, 255, 0.5);
+				--button-bg: rgba(255, 255, 255, 0.36);
+				--button-hover: rgba(255, 255, 255, 0.62);
+				--button-border: rgba(255, 255, 255, 0.46);
+				--icon-bg: rgba(255, 255, 255, 0.48);
+				--shadow: 0 42px 90px rgba(45, 55, 90, 0.18), 0 12px 30px rgba(45, 55, 90, 0.12);
 			}
 		}
 		* { box-sizing: border-box; }
@@ -51,138 +78,301 @@
 			min-height: 100vh;
 			font-family: var(--font);
 			color: var(--text);
-			background:
-				radial-gradient(ellipse 80% 60% at 20% 0%, var(--glow1), transparent 55%),
-				radial-gradient(ellipse 70% 50% at 90% 20%, var(--glow2), transparent 50%),
-				linear-gradient(165deg, var(--bg0), var(--bg1));
+			background: linear-gradient(var(--mesh-angle), var(--bg0), var(--bg1));
 			display: grid;
 			place-items: center;
 			padding: clamp(20px, 4vw, 40px);
+			overflow: hidden;
+			-webkit-font-smoothing: antialiased;
 		}
-		.panel {
-			width: min(680px, 100%);
-			padding: clamp(28px, 5vw, 40px);
-			border-radius: var(--panel-radius);
-			background: var(--glass);
-			backdrop-filter: blur(20px);
-			-webkit-backdrop-filter: blur(20px);
-			border: var(--panel-border-width) solid var(--stroke);
-			box-shadow: var(--shadow);
+		.bg-mesh {
+			position: fixed;
+			inset: 0;
+			z-index: -1;
+			overflow: hidden;
+			background: linear-gradient(var(--mesh-angle), var(--bg0), var(--bg1));
+			transition: background 0.8s ease;
 		}
-		.brand {
-			margin: 0 0 28px;
-			font-size: clamp(1.35rem, 4vw, 1.6rem);
-			font-weight: 600;
-			letter-spacing: -0.03em;
-			line-height: 1.2;
-			background: linear-gradient(120deg, var(--text), var(--dim));
-			-webkit-background-clip: text;
-			background-clip: text;
-			color: transparent;
+		.blob {
+			position: absolute;
+			border-radius: 999px;
+			filter: blur(90px);
+			opacity: var(--blob-opacity);
+			will-change: transform;
+			animation: float 22s infinite alternate cubic-bezier(0.45, 0.05, 0.55, 0.95);
+		}
+		.blob-1 {
+			width: min(560px, 62vw);
+			height: min(560px, 62vw);
+			top: var(--blob-1-top);
+			left: var(--blob-1-left);
+			background: var(--blob1);
+		}
+		.blob-2 {
+			width: min(520px, 58vw);
+			height: min(520px, 58vw);
+			right: var(--blob-2-right);
+			bottom: var(--blob-2-bottom);
+			background: var(--blob2);
+			animation-delay: -7s;
+		}
+		.blob-3 {
+			width: min(420px, 48vw);
+			height: min(420px, 48vw);
+			top: var(--blob-3-top);
+			left: var(--blob-3-left);
+			background: var(--blob3);
+			animation-delay: -13s;
+		}
+		@keyframes float {
+			0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+			33% { transform: translate(5%, 9%) scale(1.06) rotate(5deg); }
+			66% { transform: translate(-6%, 4%) scale(0.96) rotate(-6deg); }
+			100% { transform: translate(2%, -10%) scale(1.12) rotate(2deg); }
 		}
 		.tiles {
+			position: relative;
+			z-index: 1;
 			display: grid;
-			gap: 12px;
+			gap: 0;
+			width: min(330px, 100%);
+			padding: 12px 0;
+			border-radius: var(--panel-radius);
+			background: var(--glass);
+			backdrop-filter: blur(50px) saturate(200%);
+			-webkit-backdrop-filter: blur(50px) saturate(200%);
+			box-shadow:
+				var(--shadow),
+				inset 0 2px 3px -1px var(--highlight),
+				inset 0 -2px 4px -1px var(--caustic),
+				inset 0 0 0 var(--panel-border-width) var(--stroke);
+			overflow: hidden;
+		}
+		.home {
+			position: relative;
+			z-index: 1;
+			display: grid;
+			justify-items: center;
+			gap: 18px;
+			width: min(430px, 100%);
+		}
+		.tiles::before {
+			content: "";
+			position: absolute;
+			top: 1px;
+			left: 1px;
+			right: 1px;
+			height: 42%;
+			border-radius: var(--panel-radius) var(--panel-radius) 28px 28px / var(--panel-radius) var(--panel-radius) 14px 14px;
+			background: linear-gradient(180deg, var(--reflection-start), var(--reflection-end));
+			pointer-events: none;
+			z-index: 3;
+		}
+		.tiles::after {
+			content: "";
+			position: absolute;
+			inset: 0;
+			background: radial-gradient(circle 170px at var(--glare-x, 50%) var(--glare-y, 18%), var(--glare), transparent 70%);
+			mix-blend-mode: overlay;
+			opacity: 0;
+			transition: opacity 0.25s ease;
+			pointer-events: none;
+			z-index: 2;
+		}
+		.tiles:hover::after {
+			opacity: 1;
 		}
 		.tile {
+			position: relative;
 			display: flex;
 			align-items: center;
-			gap: 16px;
-			padding: 18px 20px;
-			border-radius: var(--tile-radius);
+			justify-content: center;
+			min-height: 54px;
+			padding: 0 34px;
+			border-radius: 0;
 			text-decoration: none;
 			color: inherit;
-			border: 1px solid var(--stroke);
-			background: var(--tile-bg);
-			transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+			border: 0;
+			background: transparent;
+			box-shadow: none;
+			overflow: hidden;
+			-webkit-tap-highlight-color: transparent;
+			transition: color 0.22s ease, text-shadow 0.22s ease;
+		}
+		.tile::before {
+			content: none;
+		}
+		.tile + .tile::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 46px;
+			right: 46px;
+			height: 1px;
+			background: linear-gradient(90deg, transparent, var(--button-border) 12%, var(--button-border) 88%, transparent);
+			opacity: 0.82;
+			pointer-events: none;
 		}
 		.tile:hover {
-			transform: translateY(var(--hover-lift));
-			border-color: color-mix(in oklab, var(--accent) 45%, var(--stroke));
-			box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+			color: color-mix(in oklab, var(--accent) 34%, var(--text));
+			text-shadow: 0 0 18px color-mix(in oklab, var(--accent) 42%, transparent);
+		}
+		.tile:active {
+			color: color-mix(in oklab, var(--accent2) 38%, var(--text));
 		}
 		.tile:focus-visible {
 			outline: 2px solid var(--accent);
 			outline-offset: 3px;
 		}
 		.tile-icon {
-			width: 44px;
-			height: 44px;
-			border-radius: var(--icon-radius);
-			display: grid;
-			place-items: center;
-			font-size: 1.25rem;
-			line-height: 1;
-			flex-shrink: 0;
-			background: linear-gradient(145deg, color-mix(in oklab, var(--accent) 35%, transparent), color-mix(in oklab, var(--accent2) 25%, transparent));
-			border: 1px solid color-mix(in oklab, var(--accent) 25%, transparent);
+			display: none;
 		}
-		html[data-frame="none"] .panel {
-			border-color: transparent;
+		html[data-frame="none"] .tiles {
+			--panel-border-width: 0px;
 		}
 		html[data-buttons="solid"] .tile {
-			background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 26%, transparent), color-mix(in oklab, var(--accent2) 22%, transparent));
+			background: transparent;
 		}
 		html[data-buttons="outline"] .tile {
 			background: transparent;
-			border-color: color-mix(in oklab, var(--accent) 34%, var(--stroke));
 		}
 		html[data-buttons="soft"] .tile {
-			background: color-mix(in oklab, var(--accent) 10%, var(--tile-bg));
-			box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+			background: transparent;
+			box-shadow: none;
 		}
 		html[data-buttons="compact"] .tile {
-			padding: 14px 16px;
+			min-height: 48px;
+			padding: 0 28px;
 		}
 		.tile-label {
-			font-size: 1.05rem;
+			position: relative;
+			z-index: 1;
+			font-size: 1.08rem;
 			font-weight: 600;
 			letter-spacing: -0.02em;
+			text-align: center;
 		}
 		.tile-arrow {
-			margin-left: auto;
-			opacity: 0.45;
-			font-size: 1.1rem;
+			display: none;
 		}
 		html[dir="rtl"] .tile {
 			direction: rtl;
 		}
-		html[dir="rtl"] .tile-arrow {
-			margin-left: 0;
-			margin-right: auto;
-			transform: scaleX(-1);
+		html[dir="rtl"] .tile + .tile::after {
+			left: 46px;
+			right: 46px;
 		}
-		html[dir="rtl"] .brand {
-			direction: ltr;
+		.quote-card {
+			position: relative;
+			width: min(100%, 430px);
+			margin: 0;
+			padding: 18px 22px;
+			border-radius: calc(var(--panel-radius) * 0.72);
+			background: color-mix(in oklab, var(--glass) 82%, transparent);
+			backdrop-filter: blur(36px) saturate(180%);
+			-webkit-backdrop-filter: blur(36px) saturate(180%);
+			box-shadow:
+				inset 0 1px 2px -1px var(--highlight),
+				inset 0 0 0 1px var(--stroke);
+			text-align: center;
+		}
+		.quote-text {
+			margin: 0;
+			font-size: clamp(0.95rem, 2.5vw, 1.08rem);
+			font-weight: 600;
+			line-height: 1.45;
+			letter-spacing: -0.02em;
+		}
+		.quote-author {
+			display: block;
+			margin-top: 10px;
+			color: var(--dim);
+			font-size: 0.86rem;
+			font-style: normal;
+		}
+		@media (max-width: 440px) {
+			body {
+				overflow: auto;
+			}
+			.tiles {
+				width: min(100%, 360px);
+			}
+			.tile-label {
+				font-size: 1rem;
+			}
 		}
 	</style>
 </head>
 <body>
-	<div class="panel">
-		<h1 class="brand" id="brand">super.scox.space</h1>
-		<nav class="tiles" aria-label="Сервисы">
+	<div class="bg-mesh" aria-hidden="true">
+		<div class="blob blob-1"></div>
+		<div class="blob blob-2"></div>
+		<div class="blob blob-3"></div>
+	</div>
+	<main class="home">
+		<nav class="tiles" id="tiles" aria-label="Сервисы">
 			<a class="tile" id="link-metube" href="/metube/" rel="noopener">
-				<span class="tile-icon" aria-hidden="true">↓</span>
-				<span class="tile-label">MeTube</span>
-				<span class="tile-arrow" aria-hidden="true">→</span>
+				<span class="tile-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M12 3v11"></path>
+						<path d="m7 10 5 5 5-5"></path>
+						<path d="M5 21h14"></path>
+					</svg>
+				</span>
+				<span class="tile-label" data-label="download">Загрузки</span>
+				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M5 12h14"></path>
+					<path d="m13 6 6 6-6 6"></path>
+				</svg>
 			</a>
 			<a class="tile" id="link-prowlarr" href="/prowlarr/" rel="noopener">
-				<span class="tile-icon" aria-hidden="true">⌕</span>
+				<span class="tile-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+						<circle cx="11" cy="11" r="7"></circle>
+						<path d="m20 20-3.5-3.5"></path>
+						<path d="M8.5 11h5"></path>
+					</svg>
+				</span>
 				<span class="tile-label" data-label="search">Поиск</span>
-				<span class="tile-arrow" aria-hidden="true">→</span>
+				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M5 12h14"></path>
+					<path d="m13 6 6 6-6 6"></path>
+				</svg>
 			</a>
 			<a class="tile" id="link-deluge" href="/flood/" rel="noopener">
-				<span class="tile-icon" aria-hidden="true">⇩</span>
+				<span class="tile-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M4 7h16"></path>
+						<path d="M7 7v10a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3V7"></path>
+						<path d="M9 11h6"></path>
+						<path d="M10 3h4"></path>
+					</svg>
+				</span>
 				<span class="tile-label" data-label="torrents">Торренты</span>
-				<span class="tile-arrow" aria-hidden="true">→</span>
+				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M5 12h14"></path>
+					<path d="m13 6 6 6-6 6"></path>
+				</svg>
 			</a>
 			<a class="tile" id="link-jellyfin" href="/jellyfin/" rel="noopener">
-				<span class="tile-icon" aria-hidden="true">▶</span>
+				<span class="tile-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+						<rect x="3" y="5" width="18" height="14" rx="4"></rect>
+						<path d="m10 9 5 3-5 3V9Z"></path>
+					</svg>
+				</span>
 				<span class="tile-label" data-label="watch">Просмотр</span>
-				<span class="tile-arrow" aria-hidden="true">→</span>
+				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M5 12h14"></path>
+					<path d="m13 6 6 6-6 6"></path>
+				</svg>
 			</a>
 		</nav>
-	</div>
+		<figure class="quote-card" aria-live="polite">
+			<blockquote class="quote-text" id="quote-text">Загружаю случайную цитату...</blockquote>
+			<figcaption class="quote-author" id="quote-author">50/50 RU / EN</figcaption>
+		</figure>
+	</main>
 	<script>
 		(function () {
 			var root = document.documentElement;
@@ -193,62 +383,154 @@
 				{
 					bg0: "#07080c",
 					bg1: "#10141f",
-					glass: "rgba(18, 22, 32, 0.72)",
-					stroke: "rgba(255, 255, 255, 0.09)",
+					blob1: "#7eb8ff",
+					blob2: "#a78bfa",
+					blob3: "#22d3ee",
+					blobOpacity: "0.46",
+					glass: "rgba(18, 22, 32, 0.42)",
+					stroke: "rgba(255, 255, 255, 0.16)",
+					highlight: "rgba(255, 255, 255, 0.24)",
+					caustic: "rgba(255, 255, 255, 0.06)",
+					reflectionStart: "rgba(255, 255, 255, 0.22)",
+					glare: "rgba(255, 255, 255, 0.18)",
 					text: "#eef1f6",
 					dim: "rgba(238, 241, 246, 0.55)",
 					accent: "#7eb8ff",
-					accent2: "#a78bfa",
-					glow1: "rgba(126, 184, 255, 0.18)",
-					glow2: "rgba(167, 139, 250, 0.14)"
+					accent2: "#a78bfa"
 				},
 				{
 					bg0: "#090b08",
 					bg1: "#172015",
-					glass: "rgba(20, 28, 20, 0.74)",
-					stroke: "rgba(213, 255, 210, 0.11)",
+					blob1: "#9be15d",
+					blob2: "#00e3ae",
+					blob3: "#70f570",
+					blobOpacity: "0.44",
+					glass: "rgba(20, 28, 20, 0.44)",
+					stroke: "rgba(213, 255, 210, 0.16)",
+					highlight: "rgba(213, 255, 210, 0.24)",
+					caustic: "rgba(213, 255, 210, 0.06)",
+					reflectionStart: "rgba(255, 255, 255, 0.2)",
+					glare: "rgba(213, 255, 210, 0.16)",
 					text: "#f0f7eb",
 					dim: "rgba(240, 247, 235, 0.56)",
 					accent: "#9be15d",
-					accent2: "#00e3ae",
-					glow1: "rgba(155, 225, 93, 0.18)",
-					glow2: "rgba(0, 227, 174, 0.12)"
+					accent2: "#00e3ae"
 				},
 				{
 					bg0: "#12070a",
 					bg1: "#251018",
-					glass: "rgba(38, 18, 27, 0.76)",
-					stroke: "rgba(255, 214, 224, 0.11)",
+					blob1: "#fb7185",
+					blob2: "#fbbf24",
+					blob3: "#f472b6",
+					blobOpacity: "0.48",
+					glass: "rgba(38, 18, 27, 0.46)",
+					stroke: "rgba(255, 214, 224, 0.17)",
+					highlight: "rgba(255, 214, 224, 0.26)",
+					caustic: "rgba(255, 214, 224, 0.07)",
+					reflectionStart: "rgba(255, 255, 255, 0.22)",
+					glare: "rgba(255, 214, 224, 0.18)",
 					text: "#fff1f5",
 					dim: "rgba(255, 241, 245, 0.56)",
 					accent: "#fb7185",
-					accent2: "#fbbf24",
-					glow1: "rgba(251, 113, 133, 0.18)",
-					glow2: "rgba(251, 191, 36, 0.13)"
+					accent2: "#fbbf24"
 				},
 				{
 					bg0: "#050b13",
 					bg1: "#071d2f",
-					glass: "rgba(9, 28, 45, 0.76)",
-					stroke: "rgba(190, 232, 255, 0.12)",
+					blob1: "#22d3ee",
+					blob2: "#38bdf8",
+					blob3: "#818cf8",
+					blobOpacity: "0.46",
+					glass: "rgba(9, 28, 45, 0.44)",
+					stroke: "rgba(190, 232, 255, 0.17)",
+					highlight: "rgba(190, 232, 255, 0.24)",
+					caustic: "rgba(190, 232, 255, 0.06)",
+					reflectionStart: "rgba(255, 255, 255, 0.2)",
+					glare: "rgba(190, 232, 255, 0.16)",
 					text: "#eaf8ff",
 					dim: "rgba(234, 248, 255, 0.55)",
 					accent: "#22d3ee",
-					accent2: "#38bdf8",
-					glow1: "rgba(34, 211, 238, 0.16)",
-					glow2: "rgba(56, 189, 248, 0.12)"
+					accent2: "#38bdf8"
 				},
 				{
 					bg0: "#110b05",
 					bg1: "#261706",
-					glass: "rgba(39, 25, 12, 0.76)",
-					stroke: "rgba(255, 221, 170, 0.12)",
+					blob1: "#f97316",
+					blob2: "#facc15",
+					blob3: "#fb7185",
+					blobOpacity: "0.48",
+					glass: "rgba(39, 25, 12, 0.46)",
+					stroke: "rgba(255, 221, 170, 0.17)",
+					highlight: "rgba(255, 221, 170, 0.25)",
+					caustic: "rgba(255, 221, 170, 0.06)",
+					reflectionStart: "rgba(255, 255, 255, 0.22)",
+					glare: "rgba(255, 221, 170, 0.16)",
 					text: "#fff7ed",
 					dim: "rgba(255, 247, 237, 0.58)",
 					accent: "#f97316",
-					accent2: "#facc15",
-					glow1: "rgba(249, 115, 22, 0.17)",
-					glow2: "rgba(250, 204, 21, 0.12)"
+					accent2: "#facc15"
+				},
+				{
+					bg0: "#0c0714",
+					bg1: "#1b0e2f",
+					blob1: "#bf5af2",
+					blob2: "#0a84ff",
+					blob3: "#ff375f",
+					blobOpacity: "0.46",
+					glass: "rgba(30, 20, 48, 0.44)",
+					stroke: "rgba(234, 213, 255, 0.16)",
+					highlight: "rgba(234, 213, 255, 0.24)",
+					caustic: "rgba(234, 213, 255, 0.06)",
+					reflectionStart: "rgba(255, 255, 255, 0.2)",
+					glare: "rgba(234, 213, 255, 0.16)",
+					text: "#f7f0ff",
+					dim: "rgba(247, 240, 255, 0.56)",
+					accent: "#c084fc",
+					accent2: "#60a5fa"
+				},
+				{
+					bg0: "#e5e5ea",
+					bg1: "#f8fafc",
+					blob1: "#ff2a5f",
+					blob2: "#007aff",
+					blob3: "#ff9500",
+					blobOpacity: "0.58",
+					glass: "rgba(255, 255, 255, 0.18)",
+					stroke: "rgba(255, 255, 255, 0.42)",
+					highlight: "rgba(255, 255, 255, 0.72)",
+					caustic: "rgba(255, 255, 255, 0.32)",
+					reflectionStart: "rgba(255, 255, 255, 0.62)",
+					glare: "rgba(255, 255, 255, 0.48)",
+					text: "#121520",
+					dim: "rgba(18, 21, 32, 0.5)",
+					accent: "#007aff",
+					accent2: "#ff2a5f",
+					buttonBg: "rgba(255, 255, 255, 0.36)",
+					buttonHover: "rgba(255, 255, 255, 0.62)",
+					buttonBorder: "rgba(255, 255, 255, 0.46)",
+					iconBg: "rgba(255, 255, 255, 0.48)"
+				},
+				{
+					bg0: "#edf7ff",
+					bg1: "#fff1f7",
+					blob1: "#60a5fa",
+					blob2: "#f472b6",
+					blob3: "#34d399",
+					blobOpacity: "0.52",
+					glass: "rgba(255, 255, 255, 0.2)",
+					stroke: "rgba(255, 255, 255, 0.44)",
+					highlight: "rgba(255, 255, 255, 0.72)",
+					caustic: "rgba(255, 255, 255, 0.3)",
+					reflectionStart: "rgba(255, 255, 255, 0.6)",
+					glare: "rgba(255, 255, 255, 0.46)",
+					text: "#172033",
+					dim: "rgba(23, 32, 51, 0.52)",
+					accent: "#2563eb",
+					accent2: "#db2777",
+					buttonBg: "rgba(255, 255, 255, 0.34)",
+					buttonHover: "rgba(255, 255, 255, 0.62)",
+					buttonBorder: "rgba(255, 255, 255, 0.46)",
+					iconBg: "rgba(255, 255, 255, 0.48)"
 				}
 			];
 			var fonts = [
@@ -259,13 +541,46 @@
 				'"Courier New", ui-monospace, monospace'
 			];
 			var shapes = [
-				{ panel: "24px", tile: "16px", icon: "12px", lift: "-2px" },
-				{ panel: "10px", tile: "8px", icon: "6px", lift: "-1px" },
 				{ panel: "34px", tile: "24px", icon: "18px", lift: "-3px" },
-				{ panel: "0px", tile: "0px", icon: "0px", lift: "-2px" }
+				{ panel: "26px", tile: "18px", icon: "14px", lift: "-2px" },
+				{ panel: "42px", tile: "28px", icon: "22px", lift: "-4px" },
+				{ panel: "18px", tile: "14px", icon: "10px", lift: "-2px" }
+			];
+			var directions = [
+				{
+					angle: "145deg",
+					blob1: ["-16%", "-12%"],
+					blob2: ["-18%", "-10%"],
+					blob3: ["28%", "45%"]
+				},
+				{
+					angle: "205deg",
+					blob1: ["-14%", "58%"],
+					blob2: ["-16%", "54%"],
+					blob3: ["30%", "-12%"]
+				},
+				{
+					angle: "320deg",
+					blob1: ["48%", "-18%"],
+					blob2: ["50%", "-14%"],
+					blob3: ["-12%", "36%"]
+				},
+				{
+					angle: "35deg",
+					blob1: ["-18%", "22%"],
+					blob2: ["-18%", "18%"],
+					blob3: ["38%", "58%"]
+				},
+				{
+					angle: "165deg",
+					blob1: ["18%", "-20%"],
+					blob2: ["12%", "-18%"],
+					blob3: ["-14%", "54%"]
+				}
 			];
 			var palette = pick(palettes);
 			var shape = pick(shapes);
+			var direction = pick(directions);
 			Object.keys(palette).forEach(function (key) {
 				root.style.setProperty("--" + key.replace(/[A-Z]/g, function (letter) {
 					return "-" + letter.toLowerCase();
@@ -277,39 +592,63 @@
 			root.style.setProperty("--icon-radius", shape.icon);
 			root.style.setProperty("--hover-lift", shape.lift);
 			root.style.setProperty("--panel-border-width", pick(["0px", "1px", "2px"]));
-			root.style.setProperty("--tile-bg", pick([
-				"rgba(255, 255, 255, 0.03)",
-				"rgba(255, 255, 255, 0.06)",
+			root.style.setProperty("--mesh-angle", direction.angle);
+			root.style.setProperty("--blob-1-top", direction.blob1[0]);
+			root.style.setProperty("--blob-1-left", direction.blob1[1]);
+			root.style.setProperty("--blob-2-bottom", direction.blob2[0]);
+			root.style.setProperty("--blob-2-right", direction.blob2[1]);
+			root.style.setProperty("--blob-3-top", direction.blob3[0]);
+			root.style.setProperty("--blob-3-left", direction.blob3[1]);
+			root.style.setProperty("--button-bg", palette.buttonBg || pick([
+				"rgba(255, 255, 255, 0.07)",
+				"rgba(255, 255, 255, 0.1)",
+				"rgba(0, 0, 0, 0.14)"
+			]));
+			root.style.setProperty("--button-hover", palette.buttonHover || pick([
+				"rgba(255, 255, 255, 0.14)",
+				"rgba(255, 255, 255, 0.2)",
+				"rgba(0, 0, 0, 0.2)"
+			]));
+			root.style.setProperty("--button-border", palette.buttonBorder || pick([
+				"rgba(255, 255, 255, 0.12)",
+				"rgba(255, 255, 255, 0.18)",
+				"rgba(255, 255, 255, 0.24)"
+			]));
+			root.style.setProperty("--icon-bg", palette.iconBg || pick([
+				"rgba(255, 255, 255, 0.1)",
+				"rgba(255, 255, 255, 0.14)",
 				"rgba(0, 0, 0, 0.12)"
 			]));
 			root.setAttribute("data-frame", Math.random() > 0.22 ? "on" : "none");
 			root.setAttribute("data-buttons", pick(["glass", "solid", "outline", "soft", "compact"]));
 
 			var languages = [
-				{ lang: "ru", dir: "ltr", nav: "Сервисы", search: "Поиск", torrents: "Торренты", watch: "Просмотр" },
-				{ lang: "bg", dir: "ltr", nav: "Услуги", search: "Търсене", torrents: "Торенти", watch: "Гледане" },
-				{ lang: "sr", dir: "ltr", nav: "Услуге", search: "Претрага", torrents: "Торенти", watch: "Гледање" },
-				{ lang: "vi", dir: "ltr", nav: "Dịch vụ", search: "Tìm kiếm", torrents: "Tải torrent", watch: "Xem phim" },
-				{ lang: "pl", dir: "ltr", nav: "Usługi", search: "Szukaj", torrents: "Torrenty", watch: "Oglądaj" },
-				{ lang: "is", dir: "ltr", nav: "Þjónustur", search: "Leita", torrents: "Straumar", watch: "Horfa" },
-				{ lang: "zh-Hans", dir: "ltr", nav: "服务", search: "搜索", torrents: "种子", watch: "观看" },
-				{ lang: "ja", dir: "ltr", nav: "サービス", search: "検索", torrents: "トレント", watch: "視聴" },
-				{ lang: "ko", dir: "ltr", nav: "서비스", search: "검색", torrents: "토렌트", watch: "시청" },
-				{ lang: "ar", dir: "rtl", nav: "الخدمات", search: "بحث", torrents: "تورنت", watch: "مشاهدة" },
-				{ lang: "fa", dir: "rtl", nav: "خدمات", search: "جستجو", torrents: "تورنت", watch: "تماشا" },
-				{ lang: "he", dir: "rtl", nav: "שירותים", search: "חיפוש", torrents: "טורנטים", watch: "צפייה" },
-				{ lang: "hi", dir: "ltr", nav: "सेवाएँ", search: "खोज", torrents: "टोरेंट", watch: "देखें" },
-				{ lang: "bn", dir: "ltr", nav: "সেবা", search: "অনুসন্ধান", torrents: "টরেন্ট", watch: "দেখুন" },
-				{ lang: "ta", dir: "ltr", nav: "சேவைகள்", search: "தேடல்", torrents: "டோரண்ட்", watch: "பார்க்க" },
-				{ lang: "ka", dir: "ltr", nav: "სერვისები", search: "ძიება", torrents: "ტორენტები", watch: "ყურება" },
-				{ lang: "hy", dir: "ltr", nav: "Ծառայություններ", search: "Որոնում", torrents: "Տոռենտներ", watch: "Դիտել" },
-				{ lang: "th", dir: "ltr", nav: "บริการ", search: "ค้นหา", torrents: "ทอร์เรนต์", watch: "รับชม" },
-				{ lang: "bo", dir: "ltr", nav: "ཞབས་ཞུ", search: "འཚོལ", torrents: "ཊོ་རེནྚ", watch: "ལྟ་བ" },
-				{ lang: "my", dir: "ltr", nav: "ဝန်ဆောင်မှုများ", search: "ရှာဖွေ", torrents: "တော်ရင့်", watch: "ကြည့်ရန်" },
-				{ lang: "km", dir: "ltr", nav: "សេវាកម្ម", search: "ស្វែងរក", torrents: "ថូរ៉ិន", watch: "មើល" },
-				{ lang: "el", dir: "ltr", nav: "Υπηρεσίες", search: "Αναζήτηση", torrents: "Torrent", watch: "Προβολή" },
-				{ lang: "dv", dir: "rtl", nav: "ޚިދުމަތްތައް", search: "ހޯދާ", torrents: "ޓޮރެންޓް", watch: "ބަލާ" },
-				{ lang: "am", dir: "ltr", nav: "አገልግሎቶች", search: "ፈልግ", torrents: "ቶሬንት", watch: "ተመልከት" }
+				{ lang: "ru", dir: "ltr", nav: "Сервисы", download: "Загрузки", search: "Поиск", torrents: "Торренты", watch: "Просмотр" },
+				{ lang: "bg", dir: "ltr", nav: "Услуги", download: "Изтегляне", search: "Търсене", torrents: "Торенти", watch: "Гледане" },
+				{ lang: "sr", dir: "ltr", nav: "Услуге", download: "Преузимање", search: "Претрага", torrents: "Торенти", watch: "Гледање" },
+				{ lang: "vi", dir: "ltr", nav: "Dịch vụ", download: "Tải về", search: "Tìm kiếm", torrents: "Tải torrent", watch: "Xem phim" },
+				{ lang: "pl", dir: "ltr", nav: "Usługi", download: "Pobierz", search: "Szukaj", torrents: "Torrenty", watch: "Oglądaj" },
+				{ lang: "is", dir: "ltr", nav: "Þjónustur", download: "Sækja", search: "Leita", torrents: "Straumar", watch: "Horfa" },
+				{ lang: "es", dir: "ltr", nav: "Servicios", download: "Descargas", search: "Buscar", torrents: "Torrents", watch: "Ver" },
+				{ lang: "fi", dir: "ltr", nav: "Palvelut", download: "Lataukset", search: "Haku", torrents: "Torrentit", watch: "Katso" },
+				{ lang: "zh-Hans", dir: "ltr", nav: "服务", download: "下载", search: "搜索", torrents: "种子", watch: "观看" },
+				{ lang: "ja", dir: "ltr", nav: "サービス", download: "ダウンロード", search: "検索", torrents: "トレント", watch: "視聴" },
+				{ lang: "ko", dir: "ltr", nav: "서비스", download: "다운로드", search: "검색", torrents: "토렌트", watch: "시청" },
+				{ lang: "ar", dir: "rtl", nav: "الخدمات", download: "تنزيلات", search: "بحث", torrents: "تورنت", watch: "مشاهدة" },
+				{ lang: "fa", dir: "rtl", nav: "خدمات", download: "دانلودها", search: "جستجو", torrents: "تورنت", watch: "تماشا" },
+				{ lang: "he", dir: "rtl", nav: "שירותים", download: "הורדות", search: "חיפוש", torrents: "טורנטים", watch: "צפייה" },
+				{ lang: "hi", dir: "ltr", nav: "सेवाएँ", download: "डाउनलोड", search: "खोज", torrents: "टोरेंट", watch: "देखें" },
+				{ lang: "bn", dir: "ltr", nav: "সেবা", download: "ডাউনলোড", search: "অনুসন্ধান", torrents: "টরেন্ট", watch: "দেখুন" },
+				{ lang: "ta", dir: "ltr", nav: "சேவைகள்", download: "பதிவிறக்கம்", search: "தேடல்", torrents: "டோரண்ட்", watch: "பார்க்க" },
+				{ lang: "ka", dir: "ltr", nav: "სერვისები", download: "ჩამოტვირთვები", search: "ძიება", torrents: "ტორენტები", watch: "ყურება" },
+				{ lang: "hy", dir: "ltr", nav: "Ծառայություններ", download: "Ներբեռնումներ", search: "Որոնում", torrents: "Տոռենտներ", watch: "Դիտել" },
+				{ lang: "th", dir: "ltr", nav: "บริการ", download: "ดาวน์โหลด", search: "ค้นหา", torrents: "ทอร์เรนต์", watch: "รับชม" },
+				{ lang: "bo", dir: "ltr", nav: "ཞབས་ཞུ", download: "ཕབ་ལེན", search: "འཚོལ", torrents: "ཊོ་རེནྚ", watch: "ལྟ་བ" },
+				{ lang: "my", dir: "ltr", nav: "ဝန်ဆောင်မှုများ", download: "ဒေါင်းလုပ်", search: "ရှာဖွေ", torrents: "တော်ရင့်", watch: "ကြည့်ရန်" },
+				{ lang: "km", dir: "ltr", nav: "សេវាកម្ម", download: "ទាញយក", search: "ស្វែងរក", torrents: "ថូរ៉ិន", watch: "មើល" },
+				{ lang: "el", dir: "ltr", nav: "Υπηρεσίες", download: "Λήψεις", search: "Αναζήτηση", torrents: "Torrent", watch: "Προβολή" },
+				{ lang: "dv", dir: "rtl", nav: "ޚިދުމަތްތައް", download: "ޑައުންލޯޑް", search: "ހޯދާ", torrents: "ޓޮރެންޓް", watch: "ބަލާ" },
+				{ lang: "am", dir: "ltr", nav: "አገልግሎቶች", download: "ውርዶች", search: "ፈልግ", torrents: "ቶሬንት", watch: "ተመልከት" }
 			];
 			var language = pick(languages);
 			root.setAttribute("lang", language.lang);
@@ -321,14 +660,10 @@
 				if (label) label.textContent = language[key];
 			});
 
-			var portal = document.documentElement.getAttribute("data-portal-domain");
-			var brand = document.getElementById("brand");
-			if (brand && portal && location.hostname !== portal) {
-				brand.textContent = location.host || "Медиа";
-				document.title = brand.textContent;
-			}
-			if (portal && location.hostname === portal && portal.indexOf(".") !== -1) {
-				var z = portal;
+			var hostname = location.hostname;
+			var isLocalHost = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(hostname);
+			if (hostname && hostname.indexOf(".") !== -1 && !isLocalHost) {
+				var z = hostname;
 				var m = {
 					"link-metube": "https://mtt." + z + "/",
 					"link-prowlarr": "https://lft." + z + "/",
@@ -340,6 +675,63 @@
 					if (el) el.setAttribute("href", m[id]);
 				});
 			}
+
+			var tiles = document.getElementById("tiles");
+			if (tiles) {
+				tiles.addEventListener("mousemove", function (event) {
+					var rect = tiles.getBoundingClientRect();
+					tiles.style.setProperty("--glare-x", event.clientX - rect.left + "px");
+					tiles.style.setProperty("--glare-y", event.clientY - rect.top + "px");
+				});
+			}
+
+			var quoteText = document.getElementById("quote-text");
+			var quoteAuthor = document.getElementById("quote-author");
+			var setQuote = function (text, author, source) {
+				if (!quoteText || !quoteAuthor) return;
+				quoteText.textContent = '"' + text.trim() + '"';
+				quoteAuthor.textContent = (author && author.trim() ? author.trim() : "Unknown") + " · " + source;
+			};
+			var loadFavQsQuote = function () {
+				return fetch("https://favqs.com/api/qotd")
+					.then(function (response) {
+						if (!response.ok) throw new Error("FavQs request failed");
+						return response.json();
+					})
+					.then(function (data) {
+						if (!data.quote || !data.quote.body) throw new Error("FavQs response is empty");
+						setQuote(data.quote.body, data.quote.author, "FavQs");
+					});
+			};
+			var loadForismaticQuote = function () {
+				return new Promise(function (resolve, reject) {
+					var callbackName = "forismaticQuote" + Date.now();
+					var script = document.createElement("script");
+					var cleanup = function () {
+						delete window[callbackName];
+						script.remove();
+					};
+					window[callbackName] = function (data) {
+						cleanup();
+						if (!data.quoteText) {
+							reject(new Error("Forismatic response is empty"));
+							return;
+						}
+						setQuote(data.quoteText, data.quoteAuthor, "Forismatic");
+						resolve();
+					};
+					script.onerror = function () {
+						cleanup();
+						reject(new Error("Forismatic request failed"));
+					};
+					script.src = "https://api.forismatic.com/api/1.0/?method=getQuote&format=jsonp&lang=ru&jsonp=" + callbackName;
+					document.head.appendChild(script);
+				});
+			};
+			(Math.random() < 0.5 ? loadForismaticQuote : loadFavQsQuote)()
+				.catch(function () {
+					setQuote("Всякая мысль подобна тесту, надо ее хорошенько вымесить.", "Фрэнсис Бэкон", "fallback");
+				});
 		})();
 	</script>
 </body>
