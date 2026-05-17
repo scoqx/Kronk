@@ -53,6 +53,9 @@ services:
       - PUID=${PUID:-1000}
       - PGID=${PGID:-1000}
       - TZ=${TZ:-UTC}
+      - DOWNLOAD_DIR=/downloads
+      - AUTH_USERNAME=${METUBE_AUTH_USERNAME:-}
+      - AUTH_PASSWORD=${METUBE_AUTH_PASSWORD:-}
     volumes:
       - ./data/media:/downloads
     networks: [stack]
