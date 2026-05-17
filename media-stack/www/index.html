@@ -148,14 +148,6 @@
 				inset 0 0 0 var(--panel-border-width) var(--stroke);
 			overflow: hidden;
 		}
-		.home {
-			position: relative;
-			z-index: 1;
-			display: grid;
-			justify-items: center;
-			gap: 18px;
-			width: min(430px, 100%);
-		}
 		.tiles::before {
 			content: "";
 			position: absolute;
@@ -262,38 +254,7 @@
 			left: 46px;
 			right: 46px;
 		}
-		.quote-card {
-			position: relative;
-			width: min(100%, 430px);
-			margin: 0;
-			padding: 18px 22px;
-			border-radius: calc(var(--panel-radius) * 0.72);
-			background: color-mix(in oklab, var(--glass) 82%, transparent);
-			backdrop-filter: blur(36px) saturate(180%);
-			-webkit-backdrop-filter: blur(36px) saturate(180%);
-			box-shadow:
-				inset 0 1px 2px -1px var(--highlight),
-				inset 0 0 0 1px var(--stroke);
-			text-align: center;
-		}
-		.quote-text {
-			margin: 0;
-			font-size: clamp(0.95rem, 2.5vw, 1.08rem);
-			font-weight: 600;
-			line-height: 1.45;
-			letter-spacing: -0.02em;
-		}
-		.quote-author {
-			display: block;
-			margin-top: 10px;
-			color: var(--dim);
-			font-size: 0.86rem;
-			font-style: normal;
-		}
 		@media (max-width: 440px) {
-			body {
-				overflow: auto;
-			}
 			.tiles {
 				width: min(100%, 360px);
 			}
@@ -309,8 +270,7 @@
 		<div class="blob blob-2"></div>
 		<div class="blob blob-3"></div>
 	</div>
-	<main class="home">
-		<nav class="tiles" id="tiles" aria-label="Сервисы">
+	<nav class="tiles" id="tiles" aria-label="Сервисы">
 			<a class="tile" id="link-metube" href="/metube/" rel="noopener">
 				<span class="tile-icon" aria-hidden="true">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -367,12 +327,7 @@
 					<path d="m13 6 6 6-6 6"></path>
 				</svg>
 			</a>
-		</nav>
-		<figure class="quote-card" aria-live="polite">
-			<blockquote class="quote-text" id="quote-text">Загружаю случайную цитату...</blockquote>
-			<figcaption class="quote-author" id="quote-author">50/50 RU / EN</figcaption>
-		</figure>
-	</main>
+	</nav>
 	<script>
 		(function () {
 			var root = document.documentElement;
@@ -684,54 +639,6 @@
 					tiles.style.setProperty("--glare-y", event.clientY - rect.top + "px");
 				});
 			}
-
-			var quoteText = document.getElementById("quote-text");
-			var quoteAuthor = document.getElementById("quote-author");
-			var setQuote = function (text, author, source) {
-				if (!quoteText || !quoteAuthor) return;
-				quoteText.textContent = '"' + text.trim() + '"';
-				quoteAuthor.textContent = (author && author.trim() ? author.trim() : "Unknown") + " · " + source;
-			};
-			var loadFavQsQuote = function () {
-				return fetch("https://favqs.com/api/qotd")
-					.then(function (response) {
-						if (!response.ok) throw new Error("FavQs request failed");
-						return response.json();
-					})
-					.then(function (data) {
-						if (!data.quote || !data.quote.body) throw new Error("FavQs response is empty");
-						setQuote(data.quote.body, data.quote.author, "FavQs");
-					});
-			};
-			var loadForismaticQuote = function () {
-				return new Promise(function (resolve, reject) {
-					var callbackName = "forismaticQuote" + Date.now();
-					var script = document.createElement("script");
-					var cleanup = function () {
-						delete window[callbackName];
-						script.remove();
-					};
-					window[callbackName] = function (data) {
-						cleanup();
-						if (!data.quoteText) {
-							reject(new Error("Forismatic response is empty"));
-							return;
-						}
-						setQuote(data.quoteText, data.quoteAuthor, "Forismatic");
-						resolve();
-					};
-					script.onerror = function () {
-						cleanup();
-						reject(new Error("Forismatic request failed"));
-					};
-					script.src = "https://api.forismatic.com/api/1.0/?method=getQuote&format=jsonp&lang=ru&jsonp=" + callbackName;
-					document.head.appendChild(script);
-				});
-			};
-			(Math.random() < 0.5 ? loadForismaticQuote : loadFavQsQuote)()
-				.catch(function () {
-					setQuote("Всякая мысль подобна тесту, надо ее хорошенько вымесить.", "Фрэнсис Бэкон", "fallback");
-				});
 		})();
 	</script>
 </body>
