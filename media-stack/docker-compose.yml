@@ -8,6 +8,8 @@
 # - Прод с поддоменами: Base URL / URL Base у Jellyfin/Prowlarr пустые; Prismarr UI на поддомене (см. .env.server.example).
 # - Prismarr → qBittorrent: URL http://qbittorrent:8080, username admin, временный пароль в логах qbittorrent.
 # - Prismarr → Prowlarr: URL http://prowlarr:9696, API key из Prowlarr.
+# - Prismarr → Radarr: URL http://radarr:7878, API key из Radarr.
+# - Prismarr → Sonarr: URL http://sonarr:8989, API key из Sonarr.
 # - Prowlarr → qBittorrent: хост qbittorrent, порт 8080, username admin, пароль qBittorrent Web UI.
 services:
   jellyfin:
@@ -67,6 +69,38 @@ services:
       - ./config/prowlarr:/config
     networks: [stack]
 
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-UTC}
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    volumes:
+      - ./config/radarr:/config
+      - ./data/media:/media
+      - ./data/media:/downloads
+    networks: [stack]
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TZ=${TZ:-UTC}
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+    volumes:
+      - ./config/sonarr:/config
+      - ./data/media:/media
+      - ./data/media:/downloads
+    networks: [stack]
+
   prismarr:
     image: shoshuo/prismarr:latest
     container_name: prismarr
@@ -84,6 +118,8 @@ services:
     depends_on:
       - qbittorrent
       - prowlarr
+      - radarr
+      - sonarr
     networks: [stack]
 
   gateway:
@@ -103,6 +139,8 @@ services:
       - qbittorrent
       - metube
       - prowlarr
+      - radarr
+      - sonarr
       - prismarr
     networks: [stack]
 

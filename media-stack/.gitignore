@@ -6,6 +6,8 @@ config/aria2/
 config/flood/
 config/qbittorrent/
 config/prowlarr/
+config/radarr/
+config/sonarr/
 caddy/config/
 caddy/data/
 caddy/letsencrypt/
