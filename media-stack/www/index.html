@@ -279,36 +279,23 @@
 						<path d="M5 21h14"></path>
 					</svg>
 				</span>
-				<span class="tile-label" data-label="download">Загрузки</span>
+				<span class="tile-label">YouTube</span>
 				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M5 12h14"></path>
 					<path d="m13 6 6 6-6 6"></path>
 				</svg>
 			</a>
-			<a class="tile" id="link-prowlarr" href="/prowlarr/" rel="noopener">
+			<a class="tile" id="link-prismarr" href="http://localhost:7070/" rel="noopener">
 				<span class="tile-icon" aria-hidden="true">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
 						<circle cx="11" cy="11" r="7"></circle>
 						<path d="m20 20-3.5-3.5"></path>
 						<path d="M8.5 11h5"></path>
+						<path d="M12 15h6"></path>
+						<path d="m15 12 3 3-3 3"></path>
 					</svg>
 				</span>
-				<span class="tile-label" data-label="search">Поиск</span>
-				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M5 12h14"></path>
-					<path d="m13 6 6 6-6 6"></path>
-				</svg>
-			</a>
-			<a class="tile" id="link-deluge" href="/flood/" rel="noopener">
-				<span class="tile-icon" aria-hidden="true">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M4 7h16"></path>
-						<path d="M7 7v10a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3V7"></path>
-						<path d="M9 11h6"></path>
-						<path d="M10 3h4"></path>
-					</svg>
-				</span>
-				<span class="tile-label" data-label="torrents">Торренты</span>
+				<span class="tile-label">Поиск видео + торренты</span>
 				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M5 12h14"></path>
 					<path d="m13 6 6 6-6 6"></path>
@@ -321,7 +308,7 @@
 						<path d="m10 9 5 3-5 3V9Z"></path>
 					</svg>
 				</span>
-				<span class="tile-label" data-label="watch">Просмотр</span>
+				<span class="tile-label">Просмотр</span>
 				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M5 12h14"></path>
 					<path d="m13 6 6 6-6 6"></path>
@@ -621,14 +608,16 @@
 				var z = hostname;
 				var m = {
 					"link-metube": "https://mtt." + z + "/",
-					"link-prowlarr": "https://lft." + z + "/",
-					"link-deluge": "https://mmd." + z + "/",
+					"link-prismarr": "https://mmd." + z + "/",
 					"link-jellyfin": "https://wwv." + z + "/"
 				};
 				Object.keys(m).forEach(function (id) {
 					var el = document.getElementById(id);
 					if (el) el.setAttribute("href", m[id]);
 				});
+			} else {
+				var prismarr = document.getElementById("link-prismarr");
+				if (prismarr) prismarr.setAttribute("href", location.protocol + "//" + hostname + ":7070/");
 			}
 
 			var tiles = document.getElementById("tiles");

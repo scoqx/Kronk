@@ -1,12 +1,13 @@
-# Один внешний вход (gateway): локально — главная и сервисы по префиксам /metube /jellyfin /prowlarr /flood (caddy/snippets/site.caddy).
+# Один внешний вход (gateway): локально — главная и сервисы по префиксам /metube /jellyfin /prowlarr (caddy/snippets/site.caddy).
 # На сервере: CADDY_PRIMARY_FILE=Caddyfile.server + docker-compose.server.yml — отдельный FQDN на портал и на каждый сервис (см. caddy/snippets/site-subdomains.caddy).
 #
 # Загрузки: ./data/media → qBittorrent /downloads и Jellyfin /media (библиотека в /media/complete).
 #
 # После первого запуска:
-# - Локально: Jellyfin Base URL /jellyfin; Prowlarr URL Base /prowlarr. Flood UI — по /flood/
-# - Прод с поддоменами: Base URL / URL Base у Jellyfin/Prowlarr пустые; Flood UI на поддомене (см. .env.server.example).
-# - Flood → qBittorrent: URL http://qbittorrent:8080, username admin, временный пароль в логах qbittorrent.
+# - Локально: Jellyfin Base URL /jellyfin; Prowlarr URL Base /prowlarr. Prismarr UI — порт 7070.
+# - Прод с поддоменами: Base URL / URL Base у Jellyfin/Prowlarr пустые; Prismarr UI на поддомене (см. .env.server.example).
+# - Prismarr → qBittorrent: URL http://qbittorrent:8080, username admin, временный пароль в логах qbittorrent.
+# - Prismarr → Prowlarr: URL http://prowlarr:9696, API key из Prowlarr.
 # - Prowlarr → qBittorrent: хост qbittorrent, порт 8080, username admin, пароль qBittorrent Web UI.
 services:
   jellyfin:
@@ -33,17 +34,6 @@ services:
     ports:
       - "${TORRENT_PEER_PORT:-6881}:${TORRENT_PEER_PORT:-6881}/tcp"
       - "${TORRENT_PEER_PORT:-6881}:${TORRENT_PEER_PORT:-6881}/udp"
-    networks: [stack]
-
-  flood:
-    image: jesec/flood:latest
-    restart: unless-stopped
-    command: ["--host", "0.0.0.0", "--port", "3000", "--rundir", "/config/flood", "--allowedpath", "/downloads"]
-    volumes:
-      - ./config/flood:/config/flood
-      - ./data/media:/downloads
-    depends_on:
-      - qbittorrent
     networks: [stack]
 
   metube:
@@ -77,6 +67,22 @@ services:
       - ./config/prowlarr:/config
     networks: [stack]
 
+  prismarr:
+    image: shoshuo/prismarr:latest
+    container_name: prismarr
+    restart: unless-stopped
+    stop_grace_period: 30s
+    environment:
+      TZ: ${TZ:-UTC}
+    ports:
+      - "${PRISMARR_HTTP_PORT:-7070}:7070"
+    volumes:
+      - prismarr_data:/var/www/html/var/data
+    depends_on:
+      - qbittorrent
+      - prowlarr
+    networks: [stack]
+
   gateway:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -92,11 +98,14 @@ services:
     depends_on:
       - jellyfin
       - qbittorrent
-      - flood
       - metube
       - prowlarr
+      - prismarr
     networks: [stack]
 
 networks:
   stack:
     driver: bridge
+
+volumes:
+  prismarr_data:

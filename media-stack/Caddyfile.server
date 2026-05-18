@@ -1,5 +1,5 @@
 # Прод: портал + сервисы на своих FQDN; автоматический HTTPS (Let's Encrypt).
-# В .env: PUBLIC_HOSTNAME, METUBE_HOSTNAME, PROWLARR_HOSTNAME, DELUGE_HOSTNAME, JELLYFIN_HOSTNAME и DNS A/AAAA.
-# Локально — Caddyfile + site.caddy (пути /metube, /prowlarr, /flood, /jellyfin).
+# В .env: PUBLIC_HOSTNAME, METUBE_HOSTNAME, PROWLARR_HOSTNAME, PRISMARR_HOSTNAME, JELLYFIN_HOSTNAME и DNS A/AAAA.
+# Локально — Caddyfile + site.caddy (пути /metube, /prowlarr, /jellyfin) + Prismarr на порту 7070.
 
 import snippets/site-subdomains.caddy

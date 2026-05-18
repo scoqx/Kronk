@@ -1,5 +1,5 @@
 # Прод: отдельные поддомены (TLS на каждом). Переменные — в env контейнера gateway (см. docker-compose.server.yml).
-# Портал: статика; MeTube / Prowlarr / Jellyfin / Flood — корень бэкенда (:8081 / :9696 / :8096 / :3000).
+# Портал: статика; MeTube / Prowlarr / Prismarr / Jellyfin — корень бэкенда (:8081 / :9696 / :7070 / :8096).
 
 {$PUBLIC_HOSTNAME} {
 	import common.caddy
@@ -29,10 +29,10 @@
 	}
 }
 
-{$DELUGE_HOSTNAME} {
+{$PRISMARR_HOSTNAME} {
 	import common.caddy
 	tls /etc/letsencrypt/live/super.scox.space/fullchain.pem /etc/letsencrypt/live/super.scox.space/privkey.pem
-	reverse_proxy flood:3000 {
+	reverse_proxy prismarr:7070 {
 		header_up Host {http.request.host}
 	}
 }
