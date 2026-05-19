@@ -279,23 +279,36 @@
 						<path d="M5 21h14"></path>
 					</svg>
 				</span>
-				<span class="tile-label" data-label="download">YouTube</span>
+				<span class="tile-label" data-label="download">Загрузки</span>
 				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M5 12h14"></path>
 					<path d="m13 6 6 6-6 6"></path>
 				</svg>
 			</a>
-			<a class="tile" id="link-prismarr" href="http://localhost:7070/" rel="noopener">
+			<a class="tile" id="link-prowlarr" href="/prowlarr/" rel="noopener">
 				<span class="tile-icon" aria-hidden="true">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
 						<circle cx="11" cy="11" r="7"></circle>
 						<path d="m20 20-3.5-3.5"></path>
 						<path d="M8.5 11h5"></path>
-						<path d="M12 15h6"></path>
-						<path d="m15 12 3 3-3 3"></path>
 					</svg>
 				</span>
-				<span class="tile-label" data-label="searchTorrents">Поиск видео + торренты</span>
+				<span class="tile-label" data-label="search">Поиск</span>
+				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M5 12h14"></path>
+					<path d="m13 6 6 6-6 6"></path>
+				</svg>
+			</a>
+			<a class="tile" id="link-deluge" href="/flood/" rel="noopener">
+				<span class="tile-icon" aria-hidden="true">
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M4 7h16"></path>
+						<path d="M7 7v10a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3V7"></path>
+						<path d="M9 11h6"></path>
+						<path d="M10 3h4"></path>
+					</svg>
+				</span>
+				<span class="tile-label" data-label="torrents">Торренты</span>
 				<svg class="tile-arrow" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
 					<path d="M5 12h14"></path>
 					<path d="m13 6 6 6-6 6"></path>
@@ -565,14 +578,32 @@
 			root.setAttribute("data-buttons", pick(["glass", "solid", "outline", "soft", "compact"]));
 
 			var languages = [
-				{ lang: "ru", dir: "ltr", nav: "Сервисы", download: "YouTube", searchTorrents: "Поиск видео + торренты", watch: "Просмотр" },
-				{ lang: "en", dir: "ltr", nav: "Services", download: "YouTube", searchTorrents: "Video search + torrents", watch: "Watch" },
-				{ lang: "bg", dir: "ltr", nav: "Услуги", download: "YouTube", searchTorrents: "Видео търсене + торенти", watch: "Гледане" },
-				{ lang: "sr", dir: "ltr", nav: "Услуге", download: "YouTube", searchTorrents: "Претрага видеа + торенти", watch: "Гледање" },
-				{ lang: "vi", dir: "ltr", nav: "Dịch vụ", download: "YouTube", searchTorrents: "Tìm video + torrent", watch: "Xem phim" },
-				{ lang: "pl", dir: "ltr", nav: "Usługi", download: "YouTube", searchTorrents: "Wyszukiwarka wideo + torrenty", watch: "Oglądaj" },
-				{ lang: "es", dir: "ltr", nav: "Servicios", download: "YouTube", searchTorrents: "Buscar videos + torrents", watch: "Ver" },
-				{ lang: "fi", dir: "ltr", nav: "Palvelut", download: "YouTube", searchTorrents: "Videohaku + torrentit", watch: "Katso" }
+				{ lang: "ru", dir: "ltr", nav: "Сервисы", download: "Загрузки", search: "Поиск", torrents: "Торренты", watch: "Просмотр" },
+				{ lang: "bg", dir: "ltr", nav: "Услуги", download: "Изтегляне", search: "Търсене", torrents: "Торенти", watch: "Гледане" },
+				{ lang: "sr", dir: "ltr", nav: "Услуге", download: "Преузимање", search: "Претрага", torrents: "Торенти", watch: "Гледање" },
+				{ lang: "vi", dir: "ltr", nav: "Dịch vụ", download: "Tải về", search: "Tìm kiếm", torrents: "Tải torrent", watch: "Xem phim" },
+				{ lang: "pl", dir: "ltr", nav: "Usługi", download: "Pobierz", search: "Szukaj", torrents: "Torrenty", watch: "Oglądaj" },
+				{ lang: "is", dir: "ltr", nav: "Þjónustur", download: "Sækja", search: "Leita", torrents: "Straumar", watch: "Horfa" },
+				{ lang: "es", dir: "ltr", nav: "Servicios", download: "Descargas", search: "Buscar", torrents: "Torrents", watch: "Ver" },
+				{ lang: "fi", dir: "ltr", nav: "Palvelut", download: "Lataukset", search: "Haku", torrents: "Torrentit", watch: "Katso" },
+				{ lang: "zh-Hans", dir: "ltr", nav: "服务", download: "下载", search: "搜索", torrents: "种子", watch: "观看" },
+				{ lang: "ja", dir: "ltr", nav: "サービス", download: "ダウンロード", search: "検索", torrents: "トレント", watch: "視聴" },
+				{ lang: "ko", dir: "ltr", nav: "서비스", download: "다운로드", search: "검색", torrents: "토렌트", watch: "시청" },
+				{ lang: "ar", dir: "rtl", nav: "الخدمات", download: "تنزيلات", search: "بحث", torrents: "تورنت", watch: "مشاهدة" },
+				{ lang: "fa", dir: "rtl", nav: "خدمات", download: "دانلودها", search: "جستجو", torrents: "تورنت", watch: "تماشا" },
+				{ lang: "he", dir: "rtl", nav: "שירותים", download: "הורדות", search: "חיפוש", torrents: "טורנטים", watch: "צפייה" },
+				{ lang: "hi", dir: "ltr", nav: "सेवाएँ", download: "डाउनलोड", search: "खोज", torrents: "टोरेंट", watch: "देखें" },
+				{ lang: "bn", dir: "ltr", nav: "সেবা", download: "ডাউনলোড", search: "অনুসন্ধান", torrents: "টরেন্ট", watch: "দেখুন" },
+				{ lang: "ta", dir: "ltr", nav: "சேவைகள்", download: "பதிவிறக்கம்", search: "தேடல்", torrents: "டோரண்ட்", watch: "பார்க்க" },
+				{ lang: "ka", dir: "ltr", nav: "სერვისები", download: "ჩამოტვირთვები", search: "ძიება", torrents: "ტორენტები", watch: "ყურება" },
+				{ lang: "hy", dir: "ltr", nav: "Ծառայություններ", download: "Ներբեռնումներ", search: "Որոնում", torrents: "Տոռենտներ", watch: "Դիտել" },
+				{ lang: "th", dir: "ltr", nav: "บริการ", download: "ดาวน์โหลด", search: "ค้นหา", torrents: "ทอร์เรนต์", watch: "รับชม" },
+				{ lang: "bo", dir: "ltr", nav: "ཞབས་ཞུ", download: "ཕབ་ལེན", search: "འཚོལ", torrents: "ཊོ་རེནྚ", watch: "ལྟ་བ" },
+				{ lang: "my", dir: "ltr", nav: "ဝန်ဆောင်မှုများ", download: "ဒေါင်းလုပ်", search: "ရှာဖွေ", torrents: "တော်ရင့်", watch: "ကြည့်ရန်" },
+				{ lang: "km", dir: "ltr", nav: "សេវាកម្ម", download: "ទាញយក", search: "ស្វែងរក", torrents: "ថូរ៉ិន", watch: "មើល" },
+				{ lang: "el", dir: "ltr", nav: "Υπηρεσίες", download: "Λήψεις", search: "Αναζήτηση", torrents: "Torrent", watch: "Προβολή" },
+				{ lang: "dv", dir: "rtl", nav: "ޚިދުމަތްތައް", download: "ޑައުންލޯޑް", search: "ހޯދާ", torrents: "ޓޮރެންޓް", watch: "ބަލާ" },
+				{ lang: "am", dir: "ltr", nav: "አገልግሎቶች", download: "ውርዶች", search: "ፈልግ", torrents: "ቶሬንት", watch: "ተመልከት" }
 			];
 			var language = pick(languages);
 			root.setAttribute("lang", language.lang);
@@ -590,16 +621,14 @@
 				var z = hostname;
 				var m = {
 					"link-metube": "https://mtt." + z + "/",
-					"link-prismarr": "https://mmd." + z + "/",
+					"link-prowlarr": "https://lft." + z + "/",
+					"link-deluge": "https://mmd." + z + "/",
 					"link-jellyfin": "https://wwv." + z + "/"
 				};
 				Object.keys(m).forEach(function (id) {
 					var el = document.getElementById(id);
 					if (el) el.setAttribute("href", m[id]);
 				});
-			} else {
-				var prismarr = document.getElementById("link-prismarr");
-				if (prismarr) prismarr.setAttribute("href", location.protocol + "//" + hostname + ":7070/");
 			}
 
 			var tiles = document.getElementById("tiles");

@@ -17,7 +17,7 @@ done
 if [[ ! -f .env ]]; then
 	echo "Нет .env — скопируйте шаблон:" >&2
 	echo "  cp .env.server.example .env" >&2
-	echo "Заполните PUBLIC_HOSTNAME, METUBE_HOSTNAME, PROWLARR_HOSTNAME, PRISMARR_HOSTNAME, JELLYFIN_HOSTNAME." >&2
+	echo "Заполните PUBLIC_HOSTNAME, METUBE_HOSTNAME, PROWLARR_HOSTNAME, DELUGE_HOSTNAME, JELLYFIN_HOSTNAME." >&2
 	exit 1
 fi
 
@@ -37,7 +37,7 @@ require_env_var METUBE_HOSTNAME
 require_env_var METUBE_AUTH_USERNAME
 require_env_var METUBE_AUTH_PASSWORD_HASH
 require_env_var PROWLARR_HOSTNAME
-require_env_var PRISMARR_HOSTNAME
+require_env_var DELUGE_HOSTNAME
 require_env_var JELLYFIN_HOSTNAME
 
 if ! grep -qE '^CADDY_PRIMARY_FILE=Caddyfile\.server' .env 2>/dev/null; then
@@ -71,7 +71,7 @@ PEER="${PEER:-6881}"
 PH="$(grep -E '^PUBLIC_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 MTT="$(grep -E '^METUBE_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 LFT="$(grep -E '^PROWLARR_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
-MMD="$(grep -E '^PRISMARR_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
+MMD="$(grep -E '^DELUGE_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 WV="$(grep -E '^JELLYFIN_HOSTNAME=' .env | cut -d= -f2- | tr -d '\r')"
 
 "${DC[@]}" -f docker-compose.yml -f docker-compose.server.yml pull
@@ -82,12 +82,9 @@ echo "Готово. Проверьте DNS (A/AAAA на IP этого серве
 echo "  ${PH}, ${MTT}, ${LFT}, ${MMD}, ${WV}"
 echo ""
 echo "Портал: https://${PH}/"
-echo "MeTube: https://${MTT}/  |  Prowlarr: https://${LFT}/  |  Prismarr: https://${MMD}/  |  Jellyfin: https://${WV}/"
+echo "MeTube: https://${MTT}/  |  Prowlarr: https://${LFT}/  |  Flood: https://${MMD}/  |  Jellyfin: https://${WV}/"
 echo ""
-echo "Prismarr → Prowlarr: URL http://prowlarr:9696, API key из Prowlarr."
-echo "Prismarr → Radarr: URL http://radarr:7878, API key из Radarr."
-echo "Prismarr → Sonarr: URL http://sonarr:8989, API key из Sonarr."
-echo "Prismarr/Prowlarr → qBittorrent: хост qbittorrent, порт 8080, username admin, пароль Web UI из логов qbittorrent."
+echo "Flood/Prowlarr → qBittorrent: хост qbittorrent, порт 8080, username admin, пароль Web UI из логов qbittorrent."
 echo "В Jellyfin/Prowlarr при поддоменах Base URL и URL Base оставьте пустыми."
 echo "Фаервол (если есть): TCP 80, 443 и TCP+UDP ${PEER} для торрентов."
 echo ""
